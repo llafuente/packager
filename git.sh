@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sudo yum install zlib-devel perl-ExtUtils-MakeMaker asciidoc xmlto openssl-devel
+sudo yum -y install zlib-devel perl-ExtUtils-MakeMaker asciidoc xmlto openssl-devel
 
 cd /tmp
 # https://github.com/git/git/releases

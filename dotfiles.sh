@@ -11,4 +11,8 @@ ln -sf dotfiles/.bash_rc .bash_rc
 rm -f .gitconfig
 ln -sf dotfiles/.gitconfig .gitconfig
 rm -f .vimrc
-ln -sf dotfiles/.vimrc  .vimrc
+ln -sf dotfiles/.vimrc .vimrc
+rm -f .node
+ln -sf dotfiles/.node .node
+rm -f .npmrc
+ln -sf dotfiles/.npmrc .npmrc

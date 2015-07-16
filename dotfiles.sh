@@ -6,8 +6,8 @@ git clone git@github.com:llafuente/dotfiles.git
 
 rm -f .bash_profile
 ln -sf dotfiles/.bash_profile .bash_profile
-rm -f .bash_rc
-ln -sf dotfiles/.bash_rc .bash_rc
+rm -f .bashrc
+ln -sf dotfiles/.bashrc .bashrc
 rm -f .gitconfig
 ln -sf dotfiles/.gitconfig .gitconfig
 rm -f .vimrc

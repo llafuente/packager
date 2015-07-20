@@ -2,7 +2,7 @@
 
 cd
 
-git clone git@github.com:llafuente/dotfiles.git
+git clone https://github.com/llafuente/dotfiles.git
 
 rm -f .bash_profile
 ln -sf dotfiles/.bash_profile .bash_profile

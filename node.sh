@@ -2,13 +2,16 @@
 
 mkdir /tmp/node/
 cd /tmp/node/
-#wget http://nodejs.org/dist/v0.10.36/node-v0.10.36-linux-x64.tar.gz
-#tar xsfv node-*-linux-*.tar.gz
-#cd node-*-linux-*
 
-wget https://iojs.org/dist/v2.1.0/iojs-v2.1.0-linux-x64.tar.xz
-tar xsfv iojs-*-linux-*.tar.xz
-cd iojs-*-linux-*
+# legacy node
+wget https://nodejs.org/dist/v0.10.40/node-v0.10.40-linux-x64.tar.gz
+tar xsfv node-*-linux-*.tar.gz
+cd node-*-linux-*
+
+# io.js
+#wget https://iojs.org/dist/v3.3.0/iojs-v3.3.0-linux-x64.tar.xz
+#tar xsfv iojs-*-linux-*.tar.xz
+#cd iojs-*-linux-*
 
 rm -f ChangeLog
 rm -f LICENSE

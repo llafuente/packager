@@ -15,7 +15,21 @@ chkconfig postgresql-9.4 on
 # systemctl enable postgresql-9.4
 # systemctl start postgresql-9.4
 
-# this should be part of the PATH?
-# /usr/pgsql-9.4/bin
+# Optional
 
-# postgres install under postgres use, so 'sudo - postgres'
+# sudo -u postgres psql
+# \password postgres;
+  # or
+# ALTER USER postgres with encrypted password 'your_password';
+
+# create databse jsonb_test;
+# grant all privileges on database jsonb_test to postgres;
+
+
+#cat >/var/lib/pgsql/9.4/data/pg_hba.conf <<DELIM
+#
+#local   all             all                                     peer
+#host    all             all             0.0.0.0/0               md5
+#host    all             all             ::1/128                 md5
+#
+#DELIM

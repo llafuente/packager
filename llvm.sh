@@ -22,7 +22,8 @@ yum install -y zlib-dev openssl-devel sqlite-devel bzip2-devel xz-libs cmake lib
 #make && make altinstall
 
 
-VERSION=3.7.0
+# VERSION=3.7.0 changed to cmake, need to redo the recipe!
+VERSION=3.6.2
 
 mkdir -p /tmp/llvm
 cd /tmp/llvm

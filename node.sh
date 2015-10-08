@@ -4,7 +4,8 @@ mkdir /tmp/node/
 cd /tmp/node/
 
 # legacy node
-wget https://nodejs.org/dist/v0.10.40/node-v0.10.40-linux-x64.tar.gz
+# wget https://nodejs.org/dist/v0.10.40/node-v0.10.40-linux-x64.tar.gz
+wget https://nodejs.org/dist/v4.1.1/node-v4.1.1-linux-x64.tar.gz
 tar xsfv node-*-linux-*.tar.gz
 cd node-*-linux-*
 

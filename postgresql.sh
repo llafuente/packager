@@ -8,28 +8,34 @@ sudo rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9
 
 sudo yum install -y postgresql94-server postgresql94-contrib postgresql94-libs
 
-service postgresql-9.4 initdb
-service postgresql-9.4 start
-chkconfig postgresql-9.4 on
+# CENTOS 6
+# sudo service postgresql-9.4 initdb
+# sudo service postgresql-9.4 start
+# sudo chkconfig postgresql-9.4 on
 
-# systemctl enable postgresql-9.4
-# systemctl start postgresql-9.4
+# CENTOS 7
+sudo /usr/pgsql-9.4/bin/postgresql94-setup initdb
+sudo systemctl enable postgresql-9.4
+sudo systemctl start postgresql-9.4
 
 # Optional
 
 # sudo -u postgres psql
 # \password postgres;
   # or
-# ALTER USER postgres with encrypted password 'your_password';
+
+sudo -u postgres psql -e "ALTER USER postgres with encrypted password 'postgres';"
 
 # create databse jsonb_test;
 # grant all privileges on database jsonb_test to postgres;
 
 
-#cat >/var/lib/pgsql/9.4/data/pg_hba.conf <<DELIM
-#
-#local   all             all                                     peer
-#host    all             all             0.0.0.0/0               md5
-#host    all             all             ::1/128                 md5
-#
-#DELIM
+cat <<DELIM | sudo tee /var/lib/pgsql/9.4/data/pg_hba.conf
+
+local   all             all                                     peer
+host    all             all             0.0.0.0/0               md5
+host    all             all             ::1/128                 md5
+
+DELIM
+
+sudo systemctl restart postgresql-9.4

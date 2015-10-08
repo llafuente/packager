@@ -15,6 +15,6 @@ Host github.com
 
 DELIM
 
-
+chmod 600 ~/.ssh/config
 
 # maybe need to edit: /etc/ssh/ssh_config

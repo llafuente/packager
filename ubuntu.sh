@@ -38,4 +38,6 @@ sudo dpkg -i virtualbox-*.deb
 wget 'https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.4_x86_64.deb'
 sudo dpkg -i vagrant*.deb
 
+sudo apt-get install -y git
+
 sh dotfiles.sh

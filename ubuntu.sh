@@ -37,18 +37,24 @@ sudo /etc/init.d/mongod start
 
 cd /tmp
 
-wget 'https://github.com/atom/atom/releases/download/v1.4.0/atom-amd64.deb'
+# install latest Atom
+wget 'https://atom.io/download/deb'
 sudo dpkg -i atom-*.deb
 
-wget 'http://c758482.r82.cf2.rackcdn.com/sublime-text_build-3083_amd64.deb'
+wget 'https://download.sublimetext.com/sublime-text_build-3103_amd64.deb'
 sudo dpkg -i sublime-text*.deb
 
-wget 'http://download.virtualbox.org/virtualbox/5.0.12/virtualbox-5.0_5.0.12-104815~Ubuntu~wily_i386.deb'
+# http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~wily_i386.deb
+# http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~trusty_i386.deb
+# http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~precise_i386.deb
+wget 'http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~xenial_i386.deb'
 sudo dpkg -i virtualbox-*.deb
 
-wget 'https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.4_x86_64.deb'
+wget 'https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb'
 sudo dpkg -i vagrant*.deb
 
 sudo apt-get install -y git
+
+sudo apt-get install terminator
 
 sh dotfiles.sh

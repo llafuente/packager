@@ -38,23 +38,28 @@ sudo /etc/init.d/mongod start
 cd /tmp
 
 # install latest Atom
-wget 'https://atom.io/download/deb'
-sudo dpkg -i atom-*.deb
+wget 'https://atom.io/download/deb' -O atom.deb
+sudo dpkg -i atom.deb
 
-wget 'https://download.sublimetext.com/sublime-text_build-3103_amd64.deb'
-sudo dpkg -i sublime-text*.deb
+wget 'https://download.sublimetext.com/sublime-text_build-3103_amd64.deb' -O sublime-text.deb
+sudo dpkg -i sublime-text.deb
 
 # http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~wily_i386.deb
 # http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~trusty_i386.deb
 # http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~precise_i386.deb
-wget 'http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~xenial_i386.deb'
-sudo dpkg -i virtualbox-*.deb
+wget 'http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~xenial_i386.deb' -O virtualbox.deb
+sudo dpkg -i virtualbox.deb
 
-wget 'https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb'
-sudo dpkg -i vagrant*.deb
+wget 'https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb' -O vagrant.deb
+sudo dpkg -i vagrant.deb
 
 sudo apt-get install -y git
 
 sudo apt-get install terminator
+
+# unity
+# http://forum.unity3d.com/threads/unity-on-linux-release-notes-and-known-issues.350256/
+wget 'http://download.unity3d.com/download_unity/linux/unity-editor-5.3.4f1+20160503_amd64.deb' -O unity-editor.deb
+sudo dpkg -i unity-editor.deb
 
 sh dotfiles.sh

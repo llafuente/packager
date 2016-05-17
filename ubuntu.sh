@@ -41,7 +41,7 @@ cd /tmp
 wget 'https://atom.io/download/deb' -O atom.deb
 sudo dpkg -i atom.deb
 
-wget 'https://download.sublimetext.com/sublime-text_build-3103_amd64.deb' -O sublime-text.deb
+wget 'https://download.sublimetext.com/sublime-text_build-3114_amd64.deb' -O sublime-text.deb
 sudo dpkg -i sublime-text.deb
 
 # http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~wily_i386.deb

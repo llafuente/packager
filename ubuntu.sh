@@ -58,8 +58,15 @@ sudo apt-get install -y git
 sudo apt-get install terminator
 
 # unity
+# prerequisites for Xenial
+sudo apt-get install lib32gcc1 lib32stdc++6 libc6-i386 libpq5
+# npm is also required but I use my own install method :)
+
 # http://forum.unity3d.com/threads/unity-on-linux-release-notes-and-known-issues.350256/
-wget 'http://download.unity3d.com/download_unity/linux/unity-editor-5.3.4f1+20160503_amd64.deb' -O unity-editor.deb
+wget 'http://download.unity3d.com/download_unity/linux/unity-editor-5.3.5f1+20160503_amd64.deb' -O unity-editor.deb
 sudo dpkg -i unity-editor.deb
+
+sudo chown root.root /opt/Unity/Editor/chrome-sandbox
+sudo chmod 4755 /opt/Unity/Editor/chrome-sandbox
 
 sh dotfiles.sh

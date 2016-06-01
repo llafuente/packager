@@ -18,7 +18,7 @@ sudo apt-get upgrade
 sudo apt-get install -y pgadmin3
 
 
-sudo apt-get install -y chromium-bsu
+sudo apt-get install -y chromium-browser
 # enable youtube!
 sudo apt-get remove -y chromium-codecs-ffmpeg
 sudo apt-get install -y chromium-codecs-ffmpeg-extra

@@ -30,7 +30,7 @@ echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | 
 
 sudo apt-get update
 
-sudo apt-get install mongodb-org
+sudo apt-get install -y mongodb-org
 
 sudo /etc/init.d/mongod start
 
@@ -44,22 +44,20 @@ sudo dpkg -i atom.deb
 wget 'https://download.sublimetext.com/sublime-text_build-3114_amd64.deb' -O sublime-text.deb
 sudo dpkg -i sublime-text.deb
 
-# http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~wily_i386.deb
-# http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~trusty_i386.deb
-# http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~precise_i386.deb
-wget 'http://download.virtualbox.org/virtualbox/5.0.20/virtualbox-5.0_5.0.20-106931~Ubuntu~xenial_i386.deb' -O virtualbox.deb
+# http://download.virtualbox.org/virtualbox/5.0.24/virtualbox-5.0_5.0.24-106931~Ubuntu~wily_i386.deb
+# http://download.virtualbox.org/virtualbox/5.0.24/virtualbox-5.0_5.0.24-106931~Ubuntu~trusty_i386.deb
+# http://download.virtualbox.org/virtualbox/5.0.24/virtualbox-5.0_5.0.24-106931~Ubuntu~precise_i386.deb
+wget 'http://download.virtualbox.org/virtualbox/5.0.24/virtualbox-5.0_5.0.24-106931~Ubuntu~xenial_i386.deb' -O virtualbox.deb
 sudo dpkg -i virtualbox.deb
 
-wget 'https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb' -O vagrant.deb
+wget 'https://releases.hashicorp.com/vagrant/1.8.4/vagrant_1.8.4_x86_64.deb' -O vagrant.deb
 sudo dpkg -i vagrant.deb
 
-sudo apt-get install -y git
-
-sudo apt-get install terminator
+sudo apt-get install -y git terminator
 
 # unity
 # prerequisites for Xenial
-sudo apt-get install lib32gcc1 lib32stdc++6 libc6-i386 libpq5
+sudo apt-get install -y lib32gcc1 lib32stdc++6 libc6-i386 libpq5
 # npm is also required but I use my own install method :)
 
 # http://forum.unity3d.com/threads/unity-on-linux-release-notes-and-known-issues.350256/

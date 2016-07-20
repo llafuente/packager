@@ -4,7 +4,7 @@ cd
 
 git clone https://github.com/llafuente/dotfiles.git
 
-for i in `find dotfiles/ -type f -not -path "dotfiles/.git/*" -not -path "dotfiles/tutorials/*" | cut -c10-`;
+for i in `find dotfiles/ -type f -not -path "dotfiles/.git/*" -not -path "dotfiles/tutorials/*" -not -path "dotfiles/bin/*" | cut -c10-`;
 do
   dir=`dirname $i`
 
@@ -26,3 +26,13 @@ do
   ln -sf "dotfiles/${i}" "${i}"
 
 done
+
+for i in `find dotfiles/bin -type f`;
+do 
+  bin=`basename $i`
+  echo "link program: ${i} as ${bin}";
+  chmod 755 ${i}
+  sudo rm -f "/usr/local/bin/${bin}"
+  sudo ln -sf "${HOME}/${i}" "/usr/local/bin/${bin}"
+done
+

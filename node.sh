@@ -1,6 +1,9 @@
 #!/bin/sh
 
-mkdir /tmp/node/
+sudo yum install -y wget
+
+rm -rf /tmp/node/
+mkdir -p /tmp/node/
 cd /tmp/node/
 
 # legacy node

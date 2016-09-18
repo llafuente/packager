@@ -44,13 +44,14 @@ sudo dpkg -i atom.deb
 wget 'https://download.sublimetext.com/sublime-text_build-3114_amd64.deb' -O sublime-text.deb
 sudo dpkg -i sublime-text.deb
 
-# http://download.virtualbox.org/virtualbox/5.0.24/virtualbox-5.0_5.0.24-106931~Ubuntu~wily_i386.deb
-# http://download.virtualbox.org/virtualbox/5.0.24/virtualbox-5.0_5.0.24-106931~Ubuntu~trusty_i386.deb
-# http://download.virtualbox.org/virtualbox/5.0.24/virtualbox-5.0_5.0.24-106931~Ubuntu~precise_i386.deb
-wget 'http://download.virtualbox.org/virtualbox/5.0.24/virtualbox-5.0_5.0.24-106931~Ubuntu~xenial_i386.deb' -O virtualbox.deb
+# lsb_release -a
+# http://download.virtualbox.org/virtualbox/5.0.26/virtualbox-5.0_5.0.26-108824~Ubuntu~wily_i386.deb
+# http://download.virtualbox.org/virtualbox/5.0.26/virtualbox-5.0_5.0.26-108824~Ubuntu~trusty_i386.deb
+# http://download.virtualbox.org/virtualbox/5.0.26/virtualbox-5.0_5.0.26-108824~Ubuntu~precise_i386.deb
+wget 'http://download.virtualbox.org/virtualbox/5.0.26/virtualbox-5.0_5.0.26-108824~Ubuntu~xenial_i386.deb' -O virtualbox.deb
 sudo dpkg -i virtualbox.deb
 
-wget 'https://releases.hashicorp.com/vagrant/1.8.4/vagrant_1.8.4_x86_64.deb' -O vagrant.deb
+wget 'https://releases.hashicorp.com/vagrant/1.8.5/vagrant_1.8.5_x86_64.deb' -O vagrant.deb
 sudo dpkg -i vagrant.deb
 
 sudo apt-get install -y git terminator
@@ -68,5 +69,11 @@ sudo apt-get -y -f install
 
 sudo chown root.root /opt/Unity/Editor/chrome-sandbox
 sudo chmod 4755 /opt/Unity/Editor/chrome-sandbox
+
+sudo apt-get install -y git python
+curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+sudo python get-pip.py
+pip -V
+sudo pip install awscli
 
 sh dotfiles.sh

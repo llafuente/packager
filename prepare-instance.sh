@@ -1,4 +1,9 @@
 #!/bin/sh
 
-yum -y groupinstall "Development Tools"
-yum install -y ImageMagick
+# run with ssh -t
+
+sudo sed -i -e 's/Defaults    requiretty.*/ #Defaults    requiretty/g' /etc/sudoers
+
+echo "OK"
+
+exit

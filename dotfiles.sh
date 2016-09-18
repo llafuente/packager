@@ -1,6 +1,16 @@
 #!/bin/sh
 
+sudo yum install -y openssl vim
+
 cd
+
+if [ -d "~/dotfiles" ]; then
+  git stash
+  git pull
+  git stash pop
+  echo "OK"
+  exit 0
+fi  
 
 git clone https://github.com/llafuente/dotfiles.git
 
@@ -36,3 +46,4 @@ do
   sudo ln -sf "${HOME}/${i}" "/usr/local/bin/${bin}"
 done
 
+echo "OK"

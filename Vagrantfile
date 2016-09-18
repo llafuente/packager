@@ -25,7 +25,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", path: "disable-selinux.sh"
   #config.vm.provision "shell", path: "mongodb.sh"
   config.vm.provision "shell", path: "node.sh"
-  config.vm.provision "shell", path: "misc.sh"
   config.vm.provision "shell", path: "ntp.sh"
   config.vm.provision "shell", path: "git.sh"
 end

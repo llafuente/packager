@@ -17,11 +17,14 @@ sudo yum --enablerepo=remi,remi-php70 install -y --nogpgcheck php php-mysql php-
 
 sudo sed -i "s/;cgi\.fix_pathinfo\=1/cgi.fix_pathinfo=0/g" /etc/php.ini
 
+
 sudo sed -i "s/listen \= 127\.0\.0\.1:9000/listen = \/var\/run\/php-fpm\/php-fpm.sock/g" /etc/php-fpm.d/www.conf
 sudo sed -i "s/;listen\.owner \= nobody/listen.owner = nobody/g" /etc/php-fpm.d/www.conf
 sudo sed -i "s/;listen\.group \= nobody/listen.group = nobody/g" /etc/php-fpm.d/www.conf
 sudo sed -i "s/user \= apache/user = nginx/g" /etc/php-fpm.d/www.conf
 sudo sed -i "s/group \= apache/group = nginx/g" /etc/php-fpm.d/www.conf
+
+/etc/php-fpm.d/www.conf
 
 cd /tmp
 curl -sS https://getcomposer.org/installer | php
@@ -29,6 +32,8 @@ sudo mv composer.phar /usr/local/bin/composer
 
 sudo systemctl start php-fpm
 sudo systemctl enable php-fpm
+
+#sudo /sbin/restorecon -R /var/www/. 
 
 php --version
 

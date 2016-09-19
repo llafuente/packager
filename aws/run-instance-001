@@ -50,7 +50,7 @@ aws_get_instance_ip
 # aws ec2 terminate-instances --instance-ids ${INSTANCE_ID}
 # aws ec2 describe-instances
 
-aws ec2 attach-volume --volume-id ${VOLUME_ID} --instance-id ${INSTANCE_ID} --device /dev/sdf
+aws ec2 attach-volume --volume-id ${VOLUME_ID} --instance-id ${INSTANCE_ID} --device /dev/xvdf
 
 aws_add_to_known_hosts
 
@@ -72,6 +72,9 @@ done
 
 ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < ../packages/wordpress.sh --db-name=wordpress --db-user=wordpress --target-dir=/var/www/html/wp0
 ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < ../packages/wordpress-nginx.sh --target-dir=/var/www/html/wp0 --domain=example.com
+
+
+ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < ./mount-ebs.sh --device=xvdf
 
 #ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP}
 

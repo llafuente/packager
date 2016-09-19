@@ -43,8 +43,20 @@ gpgcheck=1
 
 DELIM
 
-
 sudo yum install -y MariaDB-server MariaDB-client
+
+mkdir -p /var/log/mysql/
+
+cat <<DELIM | sudo tee -a /etc/my.conf
+[mysql]
+general-log
+general-log-file=/var/log/mysql/mysqld.log
+log-output=file
+
+slow_query_log = 1
+long_query_time = 1
+slow_query_log_file = /var/log/mysql/slow-queries.log
+DELIM
 
 sudo systemctl start mariadb
 

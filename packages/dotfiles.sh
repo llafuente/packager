@@ -1,16 +1,20 @@
 #!/bin/sh
 
+# vim is my git editor
 sudo yum install -y openssl vim
 
 cd
 
+# if exists, update
 if [ -d "~/dotfiles" ]; then
   git stash
   git pull
   git stash pop
   echo "OK"
   exit 0
-fi  
+fi
+
+# create
 
 git clone https://github.com/llafuente/dotfiles.git
 
@@ -38,7 +42,7 @@ do
 done
 
 for i in `find dotfiles/bin -type f`;
-do 
+do
   bin=`basename $i`
   echo "link program: ${i} as ${bin}";
   chmod 755 ${i}

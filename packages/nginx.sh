@@ -1,5 +1,8 @@
 #!/bin/sh
 
+LOCAL_FILE_PATH=~/vagrant #aws
+LOCAL_FILE_PATH=.. # local
+
 set -x
 set -e
 
@@ -11,7 +14,7 @@ sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
 
 # curl 'https://raw.githubusercontent.com/llafuente/vagrant/master/nginx/nginx.conf'
 
-sudo cp -f ~/vagrant/nginx/nginx.conf /etc/nginx/nginx.conf
+sudo cp -f ${LOCAL_FILE_PATH}/nginx/nginx.conf /etc/nginx/nginx.conf
 
 sudo systemctl start nginx
 sudo systemctl enable nginx

@@ -1,4 +1,12 @@
-#!/bin/sh
+#!/bin/bash
+
+function aws_prerequisites {
+  if [ -z ${AWS_CLIENT_PEM} ]; then
+    echo "undefined AWS_CLIENT_PEM"
+    echo "edit and execute set-global-vars.sh"
+    exit 1
+  fi
+}
 
 function aws_get_volume_id {
   VOLUME_ID=$(node -e "console.log(require('${TMP_FILE}').VolumeId)")
@@ -37,7 +45,7 @@ function aws_wait_instance {
       > ${TMP_FILE}
 
       cat ${TMP_FILE}
-  
+
     STATE=$(node -e "console.log(require('${TMP_FILE}').Reservations[0].Instances[0].State.Name)")
     sleep 1
   done
@@ -49,6 +57,6 @@ function ssh_until_sucesss {
   while "$repeat"; do
     sleep 5
     echo "new ssh attempt..."
-    ssh -i ~/${ACCOUNT}.pem ec2-user@${INSTANCE_IP} "exit" && repeat=false
-  done 
+    ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "exit" && repeat=false
+  done
 }

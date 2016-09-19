@@ -1,19 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 
 # initial setup for my aws clients after `aws configure`
 
-set -x
 set -e
+set -x
 
+source ./utils.sh
+aws_prerequisites
 
-ACCOUNT="aws"
+echo "Using account: ${AWS_CLIENT_PEM}"
 
-echo "Using account: ${ACCOUNT}"
+aws ec2 create-key-pair --key-name $AWS_CLIENT_PEM --query 'KeyMaterial' --output text > ~/.ssh/${AWS_CLIENT_PEM}.pem
+chmod 400 ~/.ssh/${AWS_CLIENT_PEM}.pem
 
-aws ec2 create-key-pair --key-name $ACCOUNT --query 'KeyMaterial' --output text > ~/${ACCOUNT}.pem
-chmod 400 ~/${ACCOUNT}.pem
-
-aws ec2 describe-key-pairs --key-name $ACCOUNT
+aws ec2 describe-key-pairs --key-name $AWS_CLIENT_PEM
 
 
 aws ec2 create-security-group --group-name webserver --description "open port 80/443"

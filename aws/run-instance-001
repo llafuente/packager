@@ -1,23 +1,18 @@
 #!/bin/bash
 
-## TODO function don't work!!! source/sh
-
 set -e
 set -x
 
+source ./utils.sh
+aws_prerequisites
+
 # configuration
 
-ACCOUNT="aws"
-REGION="eu-central-1"
-AVAILABILITY_ZONE="eu-central-1a"
 #VOLUME_ID="vol-???"
 
 # end of configuration
 
-
-source ./utils.sh
 TMP_FILE=$(mktemp --suffix .json)
-
 
 # ireland
 # CentOS 7.2 x86_64 with cloud-init (HVM) - ami-1f5dfe6c
@@ -29,7 +24,7 @@ TMP_FILE=$(mktemp --suffix .json)
 if [ -z "$VOLUME_ID" ]; then
   aws ec2 create-volume \
     --size 5 \
-    --region ${REGION} --availability-zone ${AVAILABILITY_ZONE} \
+    --region ${AWS_DEFAULT_REGION} --availability-zone ${AWS_AVAILABILITY_ZONE} \
     --volume-type gp2 > ${TMP_FILE}
 
   aws_get_volume_id
@@ -41,8 +36,8 @@ fi
 aws ec2 run-instances \
   --image-id ami-96d2cefa \
   --instance-type t2.micro \
-  --region ${REGION} --placement AvailabilityZone=${AVAILABILITY_ZONE} \
-  --key-name ${ACCOUNT} \
+  --region ${AWS_DEFAULT_REGION} --placement AvailabilityZone=${AWS_AVAILABILITY_ZONE} \
+  --key-name ${AWS_CLIENT_PEM} \
   --security-groups webserver dbserver administrable \
   > ${TMP_FILE}
 
@@ -62,23 +57,23 @@ aws_add_to_known_hosts
 
 ssh_until_sucesss
 
-ssh -i ~/${ACCOUNT}.pem ec2-user@${INSTANCE_IP} "mkdir -p /home/ec2-user/vagrant/"
-#scp -i ~/${ACCOUNT}.pem -pr ../ ec2-user@${INSTANCE_IP}:/home/ec2-user/vagrant/
-rsync -azvv -e "ssh -i ~/${ACCOUNT}.pem" ../ ec2-user@${INSTANCE_IP}:/home/ec2-user/vagrant/
+ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "mkdir -p /home/ec2-user/vagrant/"
+#scp -i ~/.ssh/${AWS_CLIENT_PEM}.pem -pr ../ ec2-user@${INSTANCE_IP}:/home/ec2-user/vagrant/
+rsync -azvv -e "ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem" ../ ec2-user@${INSTANCE_IP}:/home/ec2-user/vagrant/
 
-ssh -tt -i ~/${ACCOUNT}.pem ec2-user@${INSTANCE_IP} "bash -s -x -e" -- < ../prepare-instance.sh
+ssh -tt -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s -x -e" -- < ../prepare-instance.sh
 
 for SH_FILE in "disable-selinux.sh" "node.sh" "git.sh" "dotfiles.sh" "ntp.sh" "nginx.sh" "mariadb.sh" "nginx-php.sh";
 do
   echo "** Installing: ${SH_FILE}"
-  ssh -i ~/${ACCOUNT}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < ../${SH_FILE}
+  ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < ../packages/${SH_FILE}
 done
 
 
-ssh -i ~/${ACCOUNT}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < ../wordpress.sh --db-name=wordpress --db-user=wordpress --target-dir=/var/www/html/wp0
-ssh -i ~/${ACCOUNT}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < ../wordpress-nginx.sh
+ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < ../packages/wordpress.sh --db-name=wordpress --db-user=wordpress --target-dir=/var/www/html/wp0
+ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < ../packages/wordpress-nginx.sh --target-dir=/var/www/html/wp0 --domain=example.com
 
-#ssh -i ~/${ACCOUNT}.pem ec2-user@${INSTANCE_IP}
+#ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP}
 
 rm -f $TMP_FILE
 

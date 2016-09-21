@@ -1,2 +1,6 @@
+.vagrant
 github_rsa
 github_rsa.pub
+/aws/lambda/aws.pem
+/aws/lambda/credentials.js
+/aws/lambda/node_modules/

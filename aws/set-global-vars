@@ -9,5 +9,6 @@ export AWS_DEFAULT_REGION="eu-central-1"
 export AWS_DEFAULT_OUTPUT="json"
 
 # custom
+export AWS_CLIENT_ID="xxx"
 export AWS_CLIENT_PEM="aws"
 export AWS_AVAILABILITY_ZONE="eu-central-1a"

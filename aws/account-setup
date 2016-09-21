@@ -24,3 +24,41 @@ aws ec2 authorize-security-group-ingress --group-name dbserver --protocol tcp --
 
 aws ec2 authorize-security-group-ingress --group-name webserver --protocol tcp --port 80 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-name webserver --protocol tcp --port 443 --cidr 0.0.0.0/0
+
+aws iam create-role \
+  --role-name lambda-cronuser-role \
+  --assume-role-policy-document file:///lambda-cronuser-role.json
+
+# aws iam update-assume-role-policy \
+#   --role-name lambda-cronuser-role \
+#   --policy-document "file://$(pwd)/lambda-cronuser-role.json"
+# aws iam delete-role --role-name lambda-cronuser-role
+
+# NOTE unused ATM
+# for lambda s3 usage, i prefer zip deploy atm
+aws s3api create-bucket \
+  --bucket "${AWS_CLIENT_ID}-aws-lambda" \
+  --acl private \
+  --region eu-west-1 \
+  --create-bucket-configuration "LocationConstraint=EU"
+
+# Run at 6:00/18:00 am (UTC) every day
+aws events put-rule \
+--name twice-day \
+--schedule-expression 'cron(0 6/12 * * ? *)'
+
+# Run at 5:00 am (UTC) every day
+aws events put-rule \
+  --name "daily" \
+  --schedule-expression "cron(0 5 * * ? *)" \
+  --state ENABLED
+
+# Run at 4:00 am (UTC) every sunday
+aws events put-rule \
+--name weekly \
+--schedule-expression 'cron(0 4 * * SUN *)'
+
+# Run at 3:00 am (UTC) every 1st of each month
+aws events put-rule \
+--name monthly \
+--schedule-expression 'cron(0 3 1 * ? *)'

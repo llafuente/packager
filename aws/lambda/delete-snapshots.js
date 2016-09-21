@@ -32,7 +32,7 @@ exports.handler = function(event, context, lambda) {
     async.eachSeries(tags.Tags, (v, callback) => {
       if (moment(v.Value).isBefore(today)) {
         console.log(`${v.ResourceId} deleted`);
-        var params =;
+
         return ec2.deleteSnapshot({
           SnapshotId: v.ResourceId,
           DryRun: DRY_RUN

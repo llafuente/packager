@@ -27,11 +27,16 @@ aws ec2 authorize-security-group-ingress --group-name webserver --protocol tcp -
 
 aws iam create-role \
   --role-name lambda-cronuser-role \
-  --assume-role-policy-document file:///lambda-cronuser-role.json
+  --assume-role-policy-document "file://$(pwd)lambda-cronuser-role-trust.json"
+
+aws iam put-role-policy \
+  --role-name lambda-cronuser-role \
+  --policy-name Ec2FullAccess --policy-document "file://$(pwd)/ec2-full-access-policy.json"
+
 
 # aws iam update-assume-role-policy \
 #   --role-name lambda-cronuser-role \
-#   --policy-document "file://$(pwd)/lambda-cronuser-role.json"
+#   --policy-document "file://$(pwd)/lambda-cronuser-role-trust.json"
 # aws iam delete-role --role-name lambda-cronuser-role
 
 # NOTE unused ATM

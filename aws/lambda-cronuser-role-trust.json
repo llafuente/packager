@@ -8,6 +8,13 @@
         "Service": "lambda.amazonaws.com"
       },
       "Sid": ""
+    },{
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Sid": ""
     }
   ]
 }

@@ -13,7 +13,7 @@ fi
 #  | node -e "require('curt').stdin_get('User.Arn')")
 
 AWS_IAM_ROLE=$(aws iam get-role --role-name lambda-cronuser-role \
-  | node -e "require('curt').stdin_get('Role.Arn')")
+  --query 'Role.Arn' --output text)
 
 
 COUNTER=0
@@ -21,15 +21,16 @@ for FUNCTION in "create-snapshots" "delete-snapshots";
 do
   COUNTER=$(($COUNTER + 1))
   ZIP="${FUNCTION}.zip"
-  zip -q -r ${ZIP} "${FUNCTION}.js" node_modules
+
+  zip -9 -q -r ${ZIP} "${FUNCTION}.js" package.json node_modules
 
   ## --code S3Bucket="${AWS_CLIENT_ID}-aws-lambda,S3Key=./${ZIP}" \
   # http://docs.aws.amazon.com/cli/latest/reference/lambda/index.html#cli-aws-lambda
 
   aws lambda delete-function --function-name "${FUNCTION}" || echo "Ignore error"
 
-  FUNCTION_ARN=$(aws lambda create-function --function-name "${FUNCTION}" --runtime nodejs \
-    --role "${AWS_IAM_ROLE}" --handler "${ZIP}.handler" \
+  FUNCTION_ARN=$(aws lambda create-function --function-name "${FUNCTION}" --runtime nodejs4.3 \
+    --role "${AWS_IAM_ROLE}" --handler "${FUNCTION}.handler" \
     --zip-file "fileb://${ZIP}" \
     --description ${FUNCTION} \
     --query 'FunctionArn' --output text)

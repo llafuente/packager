@@ -71,7 +71,7 @@ sudo chown root.root /opt/Unity/Editor/chrome-sandbox
 sudo chmod 4755 /opt/Unity/Editor/chrome-sandbox
 
 sudo apt-get install -y git python
-curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+curl -s "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
 sudo python get-pip.py
 pip -V
 sudo pip install awscli

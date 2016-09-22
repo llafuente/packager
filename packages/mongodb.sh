@@ -10,5 +10,7 @@ DELIM
 
 sudo yum install -y mongodb-org
 
+#TODO logs
+
 sudo service mongod start
 sudo chkconfig mongod on

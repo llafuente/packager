@@ -8,14 +8,14 @@ set -x
 source ./utils.sh
 aws_prerequisites
 
-echo "Using account: ${AWS_CLIENT_PEM}"
+echo "Using account: ${AWS_CLIENT_ID}"
 
+echo "Create key pair: ${AWS_CLIENT_PEM}"
 aws ec2 create-key-pair --key-name $AWS_CLIENT_PEM --query 'KeyMaterial' --output text > ~/.ssh/${AWS_CLIENT_PEM}.pem
 chmod 400 ~/.ssh/${AWS_CLIENT_PEM}.pem
+# aws ec2 describe-key-pairs --key-name $AWS_CLIENT_PEM
 
-aws ec2 describe-key-pairs --key-name $AWS_CLIENT_PEM
-
-
+echo "Create & Configure security groups"
 aws ec2 create-security-group --group-name webserver --description "open port 80/443"
 aws ec2 create-security-group --group-name dbserver --description "open port 3306"
 aws ec2 create-security-group --group-name administrable --description "open everything to admin ips"
@@ -25,6 +25,7 @@ aws ec2 authorize-security-group-ingress --group-name dbserver --protocol tcp --
 aws ec2 authorize-security-group-ingress --group-name webserver --protocol tcp --port 80 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-name webserver --protocol tcp --port 443 --cidr 0.0.0.0/0
 
+echo "Create lambda role for cron operations"
 aws iam create-role \
   --role-name lambda-cronuser-role \
   --assume-role-policy-document "file://$(pwd)lambda-cronuser-role-trust.json"
@@ -33,12 +34,13 @@ aws iam put-role-policy \
   --role-name lambda-cronuser-role \
   --policy-name Ec2FullAccess --policy-document "file://$(pwd)/ec2-full-access-policy.json"
 
-
 # aws iam update-assume-role-policy \
 #   --role-name lambda-cronuser-role \
 #   --policy-document "file://$(pwd)/lambda-cronuser-role-trust.json"
 # aws iam delete-role --role-name lambda-cronuser-role
 
+
+echo "Create S3 Bucket for lamnda code deploy"
 # NOTE unused ATM
 # for lambda s3 usage, i prefer zip deploy atm
 aws s3api create-bucket \
@@ -47,6 +49,7 @@ aws s3api create-bucket \
   --region eu-west-1 \
   --create-bucket-configuration "LocationConstraint=EU"
 
+echo "Create cron events"
 # Run at 6:00/18:00 am (UTC) every day
 aws events put-rule \
 --name twice-day \
@@ -67,3 +70,7 @@ aws events put-rule \
 aws events put-rule \
 --name monthly \
 --schedule-expression 'cron(0 3 1 * ? *)'
+
+echo "Create instance role logrotate"
+aws iam create-instance-profile --instance-profile-name logrotate
+aws iam add-role-to-instance-profile

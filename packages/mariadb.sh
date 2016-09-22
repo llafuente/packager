@@ -46,9 +46,14 @@ DELIM
 sudo yum install -y MariaDB-server MariaDB-client
 
 mkdir -p /var/log/mysql/
+chown mysql:mysql /var/log/mysql/
 
-cat <<DELIM | sudo tee -a /etc/my.conf
-[mysql]
+ALREADY=$(grep /etc/my.cnf "# mariadb.sh")
+
+if [ -z "${ALREADY}" ]; then
+  cat <<DELIM | sudo tee -a /etc/my.cnf
+# mariadb.sh
+[mysqld]
 general-log
 general-log-file=/var/log/mysql/mysqld.log
 log-output=file
@@ -56,7 +61,41 @@ log-output=file
 slow_query_log = 1
 long_query_time = 1
 slow_query_log_file = /var/log/mysql/slow-queries.log
+
+log-error=/var/log/mysql/mysql-error.log
+
+#open-files-limit
+#innodb_open_files
 DELIM
+fi
+
+# rotate logs, daily with date, compressed, delayed...
+cat <<DELIM | sudo tee /etc/logrotate.d/mysql
+/var/log/mysql/*log {
+    #missingok
+    create 0644 mysql mysql
+    daily
+    rotate 14
+    notifempty
+    sharedscripts
+    dateext
+    dateformat .%Y-%m-%d
+    compress
+    compresscmd /usr/bin/xz
+    compressoptions -9
+    compressext .xz
+    delaycompress
+    postrotate
+      # just if mysqld is really running
+      if test -x /usr/bin/mysqladmin && \
+         /usr/bin/mysqladmin ping &>/dev/null
+      then
+         /usr/bin/mysqladmin flush-logs
+      fi
+    endscript
+}
+DELIM
+
 
 sudo systemctl start mariadb
 

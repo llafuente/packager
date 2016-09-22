@@ -1,10 +1,10 @@
 #!/bin/sh
 # sh wordpress-nginx.sh --target-dir=/var/www/html/wp0 --domain=example.com
-LOCAL_FILE_PATH=~/vagrant #aws
-LOCAL_FILE_PATH=.. # local
 
 set -x
 set -e
+
+SSL=0
 
 for i in "$@"
 do
@@ -15,6 +15,10 @@ case $i in
   ;;
   --target-dir=*)
     TARGET_DIR="${i#*=}"
+    shift # past argument=value
+  ;;
+  --ssl)
+    SSL=1
     shift # past argument=value
   ;;
   *)
@@ -37,26 +41,14 @@ fi
 
 WP_NAME=$(basename ${TARGET_DIR})
 
-SSL=0
-for i in "$@"
-do
-case $i in
-  --ssl)
-    SSL=1
-    shift # past argument=value
-  ;;
-  *)
-    # unknown option
-  ;;
-esac
-done
+echo $INSTALLER_PATH
 
-sudo cp -rf ${LOCAL_FILE_PATH}/nginx/global /etc/nginx/sites-available/global
+sudo cp -rf "${INSTALLER_PATH}/nginx/global" /etc/nginx/sites-available/global
 
 if [ $SSL -eq 1 ]; then
-  SOURCE_FILE="${LOCAL_FILE_PATH}/nginx/wordpress-site-ssl.conf"
+  SOURCE_FILE="${INSTALLER_PATH}/nginx/wordpress-site-ssl.conf"
 else
-  SOURCE_FILE="${LOCAL_FILE_PATH}/nginx/wordpress-site.conf"
+  SOURCE_FILE="${INSTALLER_PATH}/nginx/wordpress-site.conf"
 fi
 
 DST_FILE="/etc/nginx/sites-available/${WP_NAME}-wordpress-site.conf"

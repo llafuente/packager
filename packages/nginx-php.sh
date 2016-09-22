@@ -16,7 +16,13 @@ sudo yum --enablerepo=remi,remi-php70 install -y --nogpgcheck php php-mysql php-
 
 
 sudo sed -i "s/;cgi\.fix_pathinfo\=1/cgi.fix_pathinfo=0/g" /etc/php.ini
+sudo sed -i "/upload_max_filesize/c\upload_max_filesize = 10M" /etc/php.ini
+sudo sed -i "/post_max_size/c\post_max_size = 12M" /etc/php.ini
+sudo sed -i "/memory_limit/c\memory_limit = 64M" /etc/php.ini
 
+# clean config
+# sudo cat /etc/php.ini | grep -v '^;' | sed '/^\s*$/d'
+# sudo cat /etc/php-fpm.d/www.conf | grep -v '^;' | sed '/^\s*$/d'
 
 sudo sed -i "s@listen \= 127\.0\.0\.1:9000@listen = /var/run/php-fpm/php-fpm.sock@g" /etc/php-fpm.d/www.conf
 sudo sed -i "s/;listen\.owner \= nobody/listen.owner = nobody/g" /etc/php-fpm.d/www.conf
@@ -26,11 +32,8 @@ sudo sed -i "s/group \= apache/group = nginx/g" /etc/php-fpm.d/www.conf
 
 # this is a list of interesting configuration for security reasons
 # max_execution_time = 300
-# memory_limit = 64M
 # log_errors = On
 # error_log = syslog
-# post_max_size = 100M
-# upload_max_filesize = 100M
 
 # fix failed (13: Permission denied) while connecting to upstream...
 # change user to listen.owner/group to nginx/nginx don't solve anything...

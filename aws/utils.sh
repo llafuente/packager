@@ -9,12 +9,12 @@ function aws_prerequisites {
 }
 
 function aws_get_volume_id {
-  VOLUME_ID=$(node -e "console.log(require('${TMP_FILE}').VolumeId)")
+  export VOLUME_ID=$(node -e "console.log(require('${TMP_FILE}').VolumeId)")
   echo "Volume found: ${VOLUME_ID}"
 }
 
 function aws_get_instance_id {
-  INSTANCE_ID=$(node -e "console.log(require('${TMP_FILE}').Instances[0].InstanceId)")
+  export INSTANCE_ID=$(node -e "console.log(require('${TMP_FILE}').Instances[0].InstanceId)")
   echo "Instance found: ${INSTANCE_ID}"
 }
 
@@ -25,7 +25,7 @@ function aws_get_instance_ip {
 
     cat ${TMP_FILE}
 
-  INSTANCE_IP=$(node -e "console.log(require('${TMP_FILE}').Reservations[0].Instances[0].PublicDnsName)")
+  export INSTANCE_IP=$(node -e "console.log(require('${TMP_FILE}').Reservations[0].Instances[0].PublicDnsName)")
 }
 
 function aws_add_to_known_hosts {

@@ -37,7 +37,7 @@ fi
 
 if [ -z $DB_PASSWORD ]
 then
-  DB_PASSWORD=`date | sha1sum | cut -c-40`
+  DB_PASSWORD=$(</dev/urandom tr -dc 'a-zA-Z0-9' | head -c 64 | sed -e 's/[\/&]/\\&/g')
 fi
 
 if [ -z $DB_NAME ]

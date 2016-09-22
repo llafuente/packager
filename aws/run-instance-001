@@ -21,13 +21,12 @@ TMP_FILE=$(mktemp --suffix .json)
 # CentOS 7.2 x86_64 with cloud-init (PV) - ami-87d2ceeb
 # CentOS 7.2 x86_64 with cloud-init (HVM) - ami-96d2cefa
 
-if [ -z "$VOLUME_ID" ]; then
-  aws ec2 create-volume \
+if [ -z "$  " ]; then
+  export VOLUME_ID=$(aws ec2 create-volume \
     --size 5 \
     --region ${AWS_DEFAULT_REGION} --availability-zone ${AWS_AVAILABILITY_ZONE} \
-    --volume-type gp2 > ${TMP_FILE}
-
-  aws_get_volume_id
+    --volume-type gp2 \
+    --query VolumeId --output text)
 fi
 
 # aws ec2 delete-volume --volume-id ${VOLUME_ID}
@@ -57,11 +56,11 @@ aws_add_to_known_hosts
 
 ssh_until_sucesss
 
-ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "mkdir -p /home/ec2-user/vagrant/"
-#scp -i ~/.ssh/${AWS_CLIENT_PEM}.pem -pr ../ ec2-user@${INSTANCE_IP}:/home/ec2-user/vagrant/
-rsync -azvv -e "ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem" ../ ec2-user@${INSTANCE_IP}:/home/ec2-user/vagrant/
+ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "mkdir -p /home/ec2-user/installer/"
+#scp -i ~/.ssh/${AWS_CLIENT_PEM}.pem -pr ../ ec2-user@${INSTANCE_IP}:/home/ec2-user/installer/
+rsync -qazvv -e "ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem" ../ ec2-user@${INSTANCE_IP}:/home/ec2-user/installer/
 
-ssh -tt -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s -x -e" -- < ../prepare-instance.sh
+ssh -tt -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s -x -e" -- < ../packages/prepare-instance.sh
 
 for SH_FILE in "disable-selinux.sh" "node.sh" "git.sh" "dotfiles.sh" "ntp.sh" "nginx.sh" "mariadb.sh" "nginx-php.sh";
 do
@@ -77,6 +76,14 @@ ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < ../pa
 ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < ./mount-ebs.sh --device=xvdf
 
 #ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP}
+
+
+#mark volumes for backup
+VOLUMES_ATTACHED=$(aws ec2 describe-instances \
+  --filters "Name=instance-id,Values=${INSTANCE_ID}" \
+  | node -e "require('curt').stdin((x) => { stdout(_.map(x.Reservations[0].Instances[0].BlockDeviceMappings, 'Ebs.VolumeId').join(' ')); }, 'json')")
+
+aws ec2 create-tags --resources ${VOLUMES_ATTACHED} --tags "Key=backup,Value=daily"
 
 rm -f $TMP_FILE
 

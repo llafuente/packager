@@ -26,10 +26,10 @@ fi
 
 sudo mkdir -p /media/${MOUNT}
 
-FSTYPE=$(lsblk --output NAME,FSTYPE | grep ${DEVICE} | awk '{print $2}')
+FSTYPE=$(lsblk --output NAME,FSTYPE | (grep "${DEVICE}" || echo) | awk '{print $2}')
 
-if [ "${FSTYPE}" -neq "xfs" ]; then
-  sudo mkfs.xfs -f /dev/${DEVICE}
+if [ "${FSTYPE}" != "xfs" ]; then
+  sudo mkfs.xfs -f "/dev/${DEVICE}"
 fi
 
 sudo mount /dev/${DEVICE} /media/${MOUNT}
@@ -63,3 +63,5 @@ do
     sudo ln -sf /media/${MOUNT}/log/${LOG_FOLDER} /var/log/${LOG_FOLDER}
   fi
 done
+
+echo "OK"

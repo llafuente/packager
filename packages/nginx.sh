@@ -1,8 +1,5 @@
 #!/bin/sh
 
-LOCAL_FILE_PATH=~/vagrant #aws
-LOCAL_FILE_PATH=.. # local
-
 set -x
 set -e
 
@@ -14,12 +11,10 @@ sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
 
 # curl 'https://raw.githubusercontent.com/llafuente/vagrant/master/nginx/nginx.conf'
 
-sudo cp -f ${LOCAL_FILE_PATH}/nginx/nginx.conf /etc/nginx/nginx.conf
+sudo cp -f "${INSTALLER_PATH}/nginx/nginx.conf" /etc/nginx/nginx.conf
 
 sudo systemctl start nginx
 sudo systemctl enable nginx
-
-nginx -v
 
 # rotate logs, daily with date, compressed, delayed...
 cat <<DELIM | sudo tee /etc/logrotate.d/nginx
@@ -42,8 +37,7 @@ cat <<DELIM | sudo tee /etc/logrotate.d/nginx
 }
 DELIM
 
-
-
+sudo nginx -v
 
 #result
 RESULT=$(systemctl status nginx.service | grep 'Active: active (running)' | wc -l)

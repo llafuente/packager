@@ -16,7 +16,7 @@ done
 if [ -z $ROOT_MYSQL_PASSWORD ]
 then
   #ROOT_MYSQL_PASSWORD=`pwgen -s 40 1`
-  ROOT_MYSQL_PASSWORD=`dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 -w 0 | rev | cut -b 2- | rev`
+  ROOT_MYSQL_PASSWORD=$(</dev/urandom tr -dc 'a-zA-Z0-9' | head -c 64 | sed -e 's/[\/&]/\\&/g')
 fi
 
 echo "Using password: $ROOT_MYSQL_PASSWORD"
@@ -25,8 +25,11 @@ echo "Using password: $ROOT_MYSQL_PASSWORD"
 echo "Root MySQL Password: $ROOT_MYSQL_PASSWORD" | sudo tee -a /root/passwords.txt
 echo -ne "$ROOT_MYSQL_PASSWORD" | sudo tee /root/mysql.txt
 
-# just to be sure...
-sudo yum remove -y mysql mysql-server mysql-devel mysql-libs.
+# just to be sure..
+ALREADY=$( (mysql --version | grep "MariaDB") || echo)
+if [ $? != 0 ] || [ -z "${ALREADY}" ]; then
+  sudo yum remove -y mysql mysql-server mysql-devel mysql-libs.
+fi
 
 # centos-7 & mariadb 10.1 configuration
 # other centos ?
@@ -45,10 +48,10 @@ DELIM
 
 sudo yum install -y MariaDB-server MariaDB-client
 
-mkdir -p /var/log/mysql/
-chown mysql:mysql /var/log/mysql/
+sudo mkdir -p /var/log/mysql/
+sudo chown mysql:mysql /var/log/mysql/
 
-ALREADY=$(grep /etc/my.cnf "# mariadb.sh")
+ALREADY=$(grep '# mariadb.sh' /etc/my.cnf || echo)
 
 if [ -z "${ALREADY}" ]; then
   cat <<DELIM | sudo tee -a /etc/my.cnf

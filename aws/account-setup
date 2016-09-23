@@ -27,17 +27,18 @@ aws ec2 authorize-security-group-ingress --group-name webserver --protocol tcp -
 
 echo "Create lambda role for cron operations"
 aws iam create-role \
-  --role-name lambda-cronuser-role \
-  --assume-role-policy-document "file://$(pwd)lambda-cronuser-role-trust.json"
+  --role-name role-lambda-cronuser \
+  --assume-role-policy-document "file://$(pwd)/assume-role-lambda-cronuser.json"
+
 
 aws iam put-role-policy \
-  --role-name lambda-cronuser-role \
-  --policy-name Ec2FullAccess --policy-document "file://$(pwd)/ec2-full-access-policy.json"
+  --role-name role-lambda-cronuser \
+  --policy-name Ec2FullAccess --policy-document "file://$(pwd)/policy-ec2-full-access.json"
 
 # aws iam update-assume-role-policy \
-#   --role-name lambda-cronuser-role \
-#   --policy-document "file://$(pwd)/lambda-cronuser-role-trust.json"
-# aws iam delete-role --role-name lambda-cronuser-role
+#   --role-name role-lambda-cronuser \
+#   --policy-document "file://$(pwd)/role-lambda-cronuser-trust.json"
+# aws iam delete-role --role-name role-lambda-cronuser
 
 
 echo "Create S3 Bucket for lamnda code deploy"
@@ -45,6 +46,12 @@ echo "Create S3 Bucket for lamnda code deploy"
 # for lambda s3 usage, i prefer zip deploy atm
 aws s3api create-bucket \
   --bucket "${AWS_CLIENT_ID}-aws-lambda" \
+  --acl private \
+  --region eu-west-1 \
+  --create-bucket-configuration "LocationConstraint=EU"
+
+aws s3api create-bucket \
+  --bucket "${AWS_CLIENT_ID}-logrotate" \
   --acl private \
   --region eu-west-1 \
   --create-bucket-configuration "LocationConstraint=EU"
@@ -72,5 +79,23 @@ aws events put-rule \
 --schedule-expression 'cron(0 3 1 * ? *)'
 
 echo "Create instance role logrotate"
-aws iam create-instance-profile --instance-profile-name logrotate
-aws iam add-role-to-instance-profile
+aws iam create-role \
+  --role-name role-logrotate \
+  --assume-role-policy-document "file://$(pwd)/assume-role-logrotate.json"
+
+TMP=$(mktemp)
+cp policy-s3-bucket-full-access.json ${TMP}
+sed -i "s/target-bucket/${AWS_CLIENT_ID}-logrotate/g" ${TMP}
+
+aws iam put-role-policy \
+  --role-name role-logrotate \
+  --policy-name S3FullAccess --policy-document "file://${TMP}"
+
+rm -f ${TMP}
+
+aws iam create-instance-profile \
+  --instance-profile-name profile-logrotate
+
+aws iam add-role-to-instance-profile \
+  --instance-profile-name profile-logrotate \
+  --role-name role-logrotate

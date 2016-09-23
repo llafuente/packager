@@ -12,7 +12,7 @@ fi
 # AWS_IAM_ROLE=$(aws iam get-user --user-name lambda-cronuser \
 #  | node -e "require('curt').stdin_get('User.Arn')")
 
-AWS_IAM_ROLE=$(aws iam get-role --role-name lambda-cronuser-role \
+AWS_IAM_ROLE=$(aws iam get-role --role-name role-lambda-cronuser \
   --query 'Role.Arn' --output text)
 
 

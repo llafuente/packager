@@ -38,6 +38,7 @@ aws ec2 run-instances \
   --region ${AWS_DEFAULT_REGION} --placement AvailabilityZone=${AWS_AVAILABILITY_ZONE} \
   --key-name ${AWS_CLIENT_PEM} \
   --security-groups webserver dbserver administrable \
+  --iam-instance-profile profile-logrotate \
   > ${TMP_FILE}
 
 aws_get_instance_id

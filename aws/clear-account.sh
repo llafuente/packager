@@ -27,12 +27,12 @@ BUCKETS=$(aws s3api list-buckets --query 'Buckets[*].Name' --output text)
 
 for BUCKET in ${BUCKETS};
 do
-  put-bucket-versioning --bucket ${BUCKET} --versioning-configuration 'MFADelete=Disabled,Status=Suspended'
+  aws s3 put-bucket-versioning --bucket ${BUCKET} --versioning-configuration 'MFADelete=Disabled,Status=Suspended'
   aws s3 rb "s3://${BUCKET}" --force
 
   # alternative? untested
   # aws s3 rm s3://bucket-name/doc --recursive
-  # aws s3api delete-bucket --bucket my-bucket --region us-east-1
+  aws s3api delete-bucket --bucket my-bucket --region us-east-1
 done
 
 
@@ -52,17 +52,48 @@ do
 done
 
 
-PROFILE_NAMES=$(aws iam list-instance-profiles --query 'InstanceProfiles[*].InstanceProfileName' --output text)
-for PROFILE_NAME in ${PROFILE_NAMES};
+FUNCTION_NAMES=$(aws lambda list-functions --query 'Functions[*].FunctionName' --output text)
+for FUNCTION_NAME in ${FUNCTION_NAMES};
 do
-  aws iam delete-instance-profile --instance-profile-name {PROFILE_NAME}
+  aws lambda delete-function --function-name ${FUNCTION_NAME}
 done
-
 
 ROLE_NAMES=$(aws iam list-roles --query 'Roles[*].RoleName' --output text)
 for ROLE_NAME in ${ROLE_NAMES};
 do
+  POLICIES=$(aws iam list-role-policies --role-name ${ROLE_NAME} --query 'PolicyNames' --output text)
+
+  for POLICY in ${POLICIES};
+  do
+    aws iam delete-role-policy --role-name ${ROLE_NAME} --policy-name ${POLICY}
+  done
+
+  PROFILES=$(aws iam list-instance-profiles-for-role --role-name ${ROLE_NAME} --query 'InstanceProfiles[].InstanceProfileName' --output text)
+
+  for PROFILE in ${PROFILES};
+  do
+    aws iam remove-role-from-instance-profile --instance-profile-name ${PROFILE} --role-name ${ROLE_NAME}
+  done
+
+  POLICIES=$(aws iam list-attached-role-policies --role-name ${ROLE_NAME} --query 'AttachedPolicies[].PolicyArn' --output text)
+
+  for POLICY in ${POLICIES};
+  do
+    aws iam detach-role-policy --role-name ${ROLE_NAME} --policy-arn ${POLICY}
+  done
+
+  # aws iam delete-instance-profile
+  
   aws iam delete-role --role-name ${ROLE_NAME}
+done
+
+PROFILE_NAMES=$(aws iam list-instance-profiles --query 'InstanceProfiles[*].InstanceProfileName' --output text)
+for PROFILE_NAME in ${PROFILE_NAMES};
+do
+
+  #remove-role-from-instance-profile
+  
+  aws iam delete-instance-profile --instance-profile-name ${PROFILE_NAME}
 done
 
 
@@ -73,15 +104,15 @@ do
 done
 
 
-ROLE_NAMES=$(aws events list-rules --query 'Rules[*].Name' --output text)
-for ROLE_NAME in ${ROLE_NAMES};
+
+
+RULE_NAMES=$(aws events list-rules --query 'Rules[*].Name' --output text)
+for RULE_NAME in ${RULE_NAMES};
 do
-  aws events list-rules --name ${ROLE_NAME}
+  #IDS=$(aws events list-targets-by-rule --rule ${RULE_NAME} --query 'Targets[].Id' --output text)
+  aws events   remove-targets --rule ${RULE_NAME} --ids "${IDS}"
+  aws events delete-rule --name ${RULE_NAME}
 done
 
 
-FUNCTION_NAMES=$(aws lambda list-functions --query 'Functions[*].FunctionName' --output text)
-for FUNCTION_NAME in ${FUNCTION_NAMES};
-do
-  aws lambda delete-function --function-name ${FUNCTION_NAME}
-done
+

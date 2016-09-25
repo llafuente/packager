@@ -8,24 +8,10 @@ function aws_prerequisites {
   fi
 }
 
-function aws_get_volume_id {
-  export VOLUME_ID=$(node -e "console.log(require('${TMP_FILE}').VolumeId)")
-  echo "Volume found: ${VOLUME_ID}"
-}
-
-function aws_get_instance_id {
-  export INSTANCE_ID=$(node -e "console.log(require('${TMP_FILE}').Instances[0].InstanceId)")
-  echo "Instance found: ${INSTANCE_ID}"
-}
-
 function aws_get_instance_ip {
-  aws ec2 describe-instances \
+  export INSTANCE_IP=$(aws ec2 describe-instances \
     --filters "Name=instance-id,Values=${INSTANCE_ID}" \
-    > ${TMP_FILE}
-
-    cat ${TMP_FILE}
-
-  export INSTANCE_IP=$(node -e "console.log(require('${TMP_FILE}').Reservations[0].Instances[0].PublicDnsName)")
+    --query 'Reservations[0].Instances[0].PublicDnsName' --output text)
 }
 
 function aws_add_to_known_hosts {
@@ -33,20 +19,27 @@ function aws_add_to_known_hosts {
   touch ~/.ssh/known_hosts
   chmod 777 ~/.ssh/known_hosts
 
-  ssh-keyscan -t rsa -H ${INSTANCE_IP} >> ~/.ssh/known_hosts
+  KNOW_HOSTS_LINE=$(ssh-keyscan -t rsa -H ${INSTANCE_IP})
+
+  if [ -z ${KNOW_HOSTS_LINE} ]; then
+    echo "Cannot have access to the instance. Open the firewall"
+    exit 1
+  fi
+
+  TEST=$(echo ${KNOW_HOSTS_LINE} | cut -d ' ' -f 3)
+  TEST=$(grep "${TEST}" ~/.ssh/known_hosts)
+  if [ -z "$TEST" ]; then
+    echo ${KNOW_HOSTS_LINE} | tee -a ~/.ssh/known_hosts
+  fi
 }
 
 function aws_wait_instance {
   STATE="pending"
   while [ "${STATE}" == "pending" ]
   do
-    aws ec2 describe-instances \
+    STATE=$(aws ec2 describe-instances \
       --filters "Name=instance-id,Values=${INSTANCE_ID}" \
-      > ${TMP_FILE}
-
-      cat ${TMP_FILE}
-
-    STATE=$(node -e "console.log(require('${TMP_FILE}').Reservations[0].Instances[0].State.Name)")
+      --query 'Reservations[0].Instances[0].State.Name' --output text)
     sleep 1
   done
 }

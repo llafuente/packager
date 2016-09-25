@@ -12,16 +12,18 @@ echo "My ip: ${MY_IP}"
 
 IP_PERMISSIONS=$(aws ec2 describe-security-groups --group-name administrable --query 'SecurityGroups[].IpPermissions[]')
 
-SKELETON=$(cat <<SKL
+if [ "${IP_PERMISSIONS}" != "[]" ]; then
+  SKELETON=$(cat <<SKL
 {
-    "DryRun": false,
-    "GroupName": "administrable",
-    "IpPermissions": ${IP_PERMISSIONS}
+  "DryRun": false,
+  "GroupName": "administrable",
+  "IpPermissions": ${IP_PERMISSIONS}
 }
 SKL
 )
 
-aws ec2 revoke-security-group-ingress --cli-input-json "${SKELETON}"
+  aws ec2 revoke-security-group-ingress --cli-input-json "${SKELETON}"
+fi
 # NOTE this doesn't work... but don't know why, for future research
 #aws ec2 revoke-security-group-ingress --group-name administrable --Ip-permissions "${IP_PERMISSIONS}"
 

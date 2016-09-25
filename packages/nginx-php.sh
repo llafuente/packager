@@ -10,9 +10,9 @@ set -e
 sudo yum install -y --nogpgcheck epel-release
 sudo rpm -qa | grep -q remi-release || sudo rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 
-sudo yum --enablerepo=remi,remi-php70 install -y --nogpgcheck php php-mysql php-fpm php-apc
+sudo yum --enablerepo=remi,remi-php70 install -y --nogpgcheck php php-mysql php-fpm php-apc php-gd
 # other packages:
-# php-opcache php-devel pcre-devel php-pear php-pecl-xdebug php-pecl-memcached php-xml php-gd php-mbstring php-mcrypt php-soap php-json php-curl
+# php-opcache php-devel pcre-devel php-pear php-pecl-xdebug php-pecl-memcached php-xml php-mbstring php-mcrypt php-soap php-json php-curl
 
 
 sudo sed -i "s/;cgi\.fix_pathinfo\=1/cgi.fix_pathinfo=0/g" /etc/php.ini

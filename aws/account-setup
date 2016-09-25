@@ -60,23 +60,22 @@ echo "Create cron events"
 # Run at 6:00/18:00 am (UTC) every day
 aws events put-rule \
 --name twice-day \
---schedule-expression 'cron(0 6/12 * * ? *)'
+--schedule-expression "cron(0 6/12 * * ? *)"
 
 # Run at 5:00 am (UTC) every day
 aws events put-rule \
   --name "daily" \
-  --schedule-expression "cron(0 5 * * ? *)" \
-  --state ENABLED
+  --schedule-expression "cron(0 5 * * ? *)"
 
 # Run at 4:00 am (UTC) every sunday
 aws events put-rule \
 --name weekly \
---schedule-expression 'cron(0 4 * * SUN *)'
+--schedule-expression "cron(0 4 * * 1 *)"
 
 # Run at 3:00 am (UTC) every 1st of each month
 aws events put-rule \
 --name monthly \
---schedule-expression 'cron(0 3 1 * ? *)'
+--schedule-expression "cron(0 3 1 * ? *)"
 
 echo "Create instance role logrotate"
 aws iam create-role \

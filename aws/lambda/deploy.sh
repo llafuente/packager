@@ -45,7 +45,12 @@ do
   aws events put-targets \
     --rule daily \
     --targets "{\"Id\" : \"1\", \"Arn\": \"${FUNCTION_ARN}\", \"Input\": \"{\\\"rule-name\\\": \\\"daily\\\"}\"}"
-    #--targets "{\"Id\" : \"1\", \"Arn\": \"${FUNCTION_ARN}\", \"Input\": {\"rule\": \"daily\"}}"
+
+  if [ "create-snapshots" == "${FUNCTION}" ]; then
+    aws events put-targets \
+      --rule daily \
+      --targets "{\"Id\" : \"1\", \"Arn\": \"${FUNCTION_ARN}\", \"Input\": \"{\\\"rule-name\\\": \\\"weekly\\\"}\"}"
+  fi
 
   aws lambda add-permission \
       --function-name "${FUNCTION}" \

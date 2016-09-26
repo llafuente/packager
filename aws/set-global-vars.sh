@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # AWS
 # credentials, here or ~/.aws/credentials
@@ -10,5 +10,5 @@ export AWS_DEFAULT_OUTPUT="json"
 
 # custom
 export AWS_CLIENT_ID="xxx"
-export AWS_CLIENT_PEM="aws"
+export AWS_CLIENT_PEM="aws-xxx"
 export AWS_AVAILABILITY_ZONE="eu-central-1a"

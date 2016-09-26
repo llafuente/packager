@@ -76,4 +76,4 @@ sudo python get-pip.py
 pip -V
 sudo pip install awscli
 
-sh dotfiles.sh
+sh packages/dotfiles.sh

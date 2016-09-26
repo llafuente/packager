@@ -1,6 +1,12 @@
 #!/bin/sh
 
 # try to clean everything in you AWS account region
+# NOTE
+# * do not remove elastic IPs
+# * do not remove anything not created by scripts in this project :)
+
+echo "security measure, remove exit before execute!"
+exit 1
 
 INSTANCE_IDS=$(aws ec2 describe-instances --query Reservations[*].Instances[*].InstanceId --output text)
 
@@ -83,7 +89,7 @@ do
   done
 
   # aws iam delete-instance-profile
-  
+
   aws iam delete-role --role-name ${ROLE_NAME}
 done
 
@@ -92,7 +98,7 @@ for PROFILE_NAME in ${PROFILE_NAMES};
 do
 
   #remove-role-from-instance-profile
-  
+
   aws iam delete-instance-profile --instance-profile-name ${PROFILE_NAME}
 done
 
@@ -113,6 +119,3 @@ do
   aws events   remove-targets --rule ${RULE_NAME} --ids "${IDS}"
   aws events delete-rule --name ${RULE_NAME}
 done
-
-
-

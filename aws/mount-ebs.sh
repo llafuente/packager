@@ -30,6 +30,8 @@ FSTYPE=$(lsblk --output NAME,FSTYPE | (grep "${DEVICE}" || echo) | awk '{print $
 
 if [ "${FSTYPE}" != "xfs" ]; then
   sudo mkfs.xfs -f "/dev/${DEVICE}"
+  # perf: write all 16Kb blocks of the EBS
+  # sudo dd if="/dev/${DEVICE}" of=/dev/null bs=16384
 fi
 
 sudo mount /dev/${DEVICE} /media/${MOUNT}
@@ -39,7 +41,7 @@ if [ ! -z $(which mysql) ]; then
   echo "moving mysql data to ebs"
 
   sudo systemctl stop mariadb
-  
+
   sudo cp -R -p /var/lib/mysql /media/${MOUNT}/mysql
   sudo mv /var/lib/mysql /var/lib/mysql.back
   sudo ln -sf /media/${MOUNT}/mysql /var/lib/mysql

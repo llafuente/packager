@@ -84,7 +84,11 @@ done
 
 mkdir -p /var/www/html/
 sudo mv /tmp/wordpress ${TARGET_DIR}
-sudo chown -Rf nginx:nginx ${TARGET_DIR}
+sudo chown -Rf ec2-user:ec2-user ${TARGET_DIR}
+# go-rx,u-rwx
 sudo chmod 755 -R ${TARGET_DIR}
+sudo chmod 777 -R ${TARGET_DIR}/wp-content/uploads/
+sudo chmod 755 ${TARGET_DIR}/wp-content/uploads/
+#sudo chmod 400 -R ${TARGET_DIR}/wp-config.php
 
 echo "OK"

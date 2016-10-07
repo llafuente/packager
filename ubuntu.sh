@@ -9,6 +9,16 @@ sudo apt-get update
 
 sudo apt-get install -y vlc browser-plugin-vlc
 
+# Ubuntu 14.04 has a very very old GCC, i need at least GCC 5
+# sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+# sudo apt-get update
+# sudo apt-get install gcc-5 g++-5
+# sudo update-alternatives --remove-all gcc
+# sudo update-alternatives --remove-all g++
+# sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 20
+# sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 20
+
+
 #instal lastest pgadmin3
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 sudo apt-get install wget ca-certificates

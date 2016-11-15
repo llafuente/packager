@@ -28,6 +28,7 @@ fi
 #aws ec2 revoke-security-group-ingress --group-name administrable --Ip-permissions "${IP_PERMISSIONS}"
 
 aws ec2 authorize-security-group-ingress --group-name administrable --protocol tcp --port 22 --cidr ${MY_IP}/32
+aws ec2 authorize-security-group-ingress --group-name administrable --protocol tcp --port 2812 --cidr ${MY_IP}/32
 
 
 echo "OK"

@@ -67,6 +67,8 @@ slow_query_log_file = /var/log/mysql/slow-queries.log
 
 log-error=/var/log/mysql/mysql-error.log
 
+pid-file=/var/lib/mysql/mysqld.pid
+
 #open-files-limit
 #innodb_open_files
 DELIM

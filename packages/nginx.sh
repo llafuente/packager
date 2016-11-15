@@ -37,6 +37,8 @@ cat <<DELIM | sudo tee /etc/logrotate.d/nginx
 }
 DELIM
 
+sudo cp -rf "${INSTALLER_PATH}/nginx/default.conf" /etc/nginx/sites-available/default.conf
+
 sudo nginx -v
 
 #result

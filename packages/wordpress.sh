@@ -1,7 +1,9 @@
 #!/bin/sh
-# sh wordpress.sh --db-name=wordpress --db-user=wordpress --target-dir=/var/www/html/wp0
+
 set -x
 set -e
+
+WP_LANG_ES=
 
 for i in "$@"
 do
@@ -21,6 +23,9 @@ case $i in
   --target-dir=*)
     TARGET_DIR="${i#*=}"
     shift # past argument=value
+  ;;
+  --lang-es)
+    WP_LANG_ES="1"
   ;;
   *)
     # unknown option
@@ -54,16 +59,16 @@ then
   exit 1
 fi
 
-echo "Using password: $DB_PASSWORD"
-echo "Target directory: $TARGET_DIR"
-echo "Wordpress: $DB_PASSWORD" | sudo tee -a /root/passwords.txt
+echo "Using password: ${DB_PASSWORD}"
+echo "Target directory: ${TARGET_DIR}"
+echo "Wordpress (${TARGET_DIR}): ${DB_PASSWORD}" | sudo tee -a /root/passwords.txt
 
 ROOT_MYSQL_PASSWORD=$(sudo cat /root/mysql.txt)
 
 mysql -uroot -p$ROOT_MYSQL_PASSWORD <<MYSQL_SCRIPT
-CREATE DATABASE IF NOT EXISTS $DB_NAME;
-CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';
-GRANT ALL PRIVILEGES ON $DB_USER.* TO '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';
+CREATE DATABASE IF NOT EXISTS ${DB_NAME};
+CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';
+GRANT ALL PRIVILEGES ON ${DB_USER}.* TO '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT
 
@@ -87,8 +92,21 @@ sudo mv /tmp/wordpress ${TARGET_DIR}
 sudo chown -Rf ec2-user:ec2-user ${TARGET_DIR}
 # go-rx,u-rwx
 sudo chmod 755 -R ${TARGET_DIR}
+sudo mkdir -p ${TARGET_DIR}/wp-content/uploads/
 sudo chmod 777 -R ${TARGET_DIR}/wp-content/uploads/
 sudo chmod 755 ${TARGET_DIR}/wp-content/uploads/
 #sudo chmod 400 -R ${TARGET_DIR}/wp-config.php
+
+# spanish translation
+if [ ! -z ${LANG_ES} ]; then
+  rm -rf wordpress
+  cd /tmp/
+  wget --quiet zip https://es.wordpress.org/wordpress-4.6.1-es_ES.zip -O wordpress-es_ES.zip
+  unzip wordpress-es_ES.zip
+  mkdir -p ${TARGET_DIR}/wp-content/languages/
+  cp -rf /tmp/wordpress/wp-content/languages/* ${TARGET_DIR}/wp-content/languages/
+  rm -rf wordpress
+fi
+
 
 echo "OK"

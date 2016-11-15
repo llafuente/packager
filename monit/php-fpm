@@ -1,0 +1,5 @@
+check process php-fpm
+  with pidfile "/var/run/php-fpm/php-fpm.pid"
+  start program = "/usr/bin/ystemctl start php-fpm.service"
+  stop program = "/usr/bin/systemctl stop php-fpm.service"
+  if memory usage > 60% for 5 cycles then restart

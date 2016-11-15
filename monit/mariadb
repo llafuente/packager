@@ -1,0 +1,5 @@
+check process mysql
+  with pidfile "/var/lib/mysql/mysqld.pid"
+  start program = "/usr/bin/systemctl start mariadb.service"
+  stop program = "/usr/bin/systemctl stop mariadb.service"
+  if memory usage > 80% for 10 cycles then restart

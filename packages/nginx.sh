@@ -1,7 +1,6 @@
 #!/bin/sh
 
-set -x
-set -e
+set -ex
 
 sudo yum install -y epel-release
 sudo yum install -y nginx

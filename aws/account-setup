@@ -6,14 +6,10 @@
 # `sh set-global-vars.sh`
 # initial setup for my aws clients
 
-set -e
-set -x
+set -ex
 
-if [ -z ${AWS_CLIENT_PEM} ]; then
-  echo "undefined AWS_CLIENT_PEM"
-  echo "aws configure, edit and execute set-global-vars.sh"
-  exit 1
-fi
+source "$(dirname "$0")/../utils.sh"
+aws_prerequisites
 
 echo "Using account: ${AWS_CLIENT_ID}"
 

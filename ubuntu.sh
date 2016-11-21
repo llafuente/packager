@@ -86,4 +86,9 @@ sudo python get-pip.py
 pip -V
 sudo pip install awscli
 
+# install gohugo.io
+# releases at: https://github.com/spf13/hugo/releases
+wget -O hugo.deb https://github.com/spf13/hugo/releases/download/v0.17/hugo_0.17-64bit.deb
+sudo dpkg -i hugo.deb
+
 sh packages/dotfiles.sh

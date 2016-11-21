@@ -3,10 +3,7 @@
 # sh wordpress-plugin.sh --url=https://downloads.wordpress.org/plugin/xxx.zip \
 # -- target-dir=xxx
 
-set -x
-set -e
-
-SSL=0
+set -ex
 
 for i in "$@"
 do

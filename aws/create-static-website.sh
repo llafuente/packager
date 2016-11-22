@@ -39,7 +39,7 @@ if [ -z ${DOMAIN} ]; then
   exit 1
 fi
 
-#maybe: "AllowedMethods": ["GET", "PUT", "POST", "DELETE"]
+# full list: "AllowedMethods": ["GET", "PUT", "POST", "DELETE"]
 tee /tmp/cors.json <<EOF >/dev/null
 {
   "CORSRules": [
@@ -51,6 +51,13 @@ tee /tmp/cors.json <<EOF >/dev/null
   ]
 }
 EOF
+
+# if your are going to use cloudfront, maybe consider using:
+#"Condition": {
+#  "StringEquals": {
+#    "aws:UserAgent": "Amazon CloudFront"
+#  }
+#}
 
 tee /tmp/policy.json <<EOF >/dev/null
 {
@@ -74,12 +81,6 @@ tee /tmp/policy.json <<EOF >/dev/null
    ]
 }
 EOF
-
-#"Condition": {
-#  "StringEquals": {
-#    "aws:UserAgent": "Amazon CloudFront"
-#  }
-#}
 
 tee /tmp/www.policy.json <<EOF >/dev/null
 {
@@ -126,28 +127,23 @@ tee /tmp/website.json <<EOF >/dev/null
 }
 EOF
 
-# create website
+# create bucket, cors, policy & website
 aws s3 mb "s3://${DOMAIN}"
-aws s3 website "s3://${DOMAIN}" --index-document index.html --error-document error.html
-aws s3api put-bucket-cors --bucket ${DOMAIN} --cors-configuration file:///tmp/cors.json
-aws s3api put-bucket-policy --bucket ${DOMAIN} --policy file:///tmp/policy.json
-aws s3api put-bucket-website --bucket ${DOMAIN} --website-configuration file://tmp/website.json
+aws s3api put-bucket-cors --bucket ${DOMAIN} \
+  --cors-configuration file:///tmp/cors.json
+aws s3api put-bucket-policy --bucket ${DOMAIN} \
+  --policy file:///tmp/policy.json
+aws s3api put-bucket-website --bucket ${DOMAIN} \
+  --website-configuration file:///tmp/website.json
 
+./sync-static-website.sh --source=${SOURCE} --domain=${DOMAIN}
 
-# sync files
-aws s3 sync "${SOURCE}" "s3://${DOMAIN}"
-
-# Ensure static files are set to cache forever - cache for a month --cache-control "max-age=2592000"
-aws s3 sync --cache-control "max-age=2592000" --acl "public-read" --sse "AES256" public/img/ s3://$DOMAIN/img/
-aws s3 sync --cache-control "max-age=2592000" --acl "public-read" --sse "AES256" public/css/ s3://$DOMAIN/css/
-aws s3 sync --cache-control "max-age=2592000" --acl "public-read" --sse "AES256" public/js/ s3://$DOMAIN/js/
-
-
-# create a dummy website for www.${DOMAIN}, redirect to non-www
+# create a dummy website for www.${DOMAIN}, redirect everything to non-www
 aws s3 mb "s3://www.${DOMAIN}"
-aws s3 website "s3://www.${DOMAIN}" --index-document index.html --error-document error.html
-aws s3api put-bucket-policy --bucket "www.${DOMAIN}" --policy file:///tmp/www.policy.json
-aws s3api put-bucket-cors --bucket "www.${DOMAIN}" --cors-configuration file:///tmp/cors.json
+aws s3api put-bucket-policy --bucket "www.${DOMAIN}" \
+  --policy file:///tmp/www.policy.json
+aws s3api put-bucket-cors --bucket "www.${DOMAIN}" \
+  --cors-configuration file:///tmp/cors.json
 
 tee /tmp/www.website.json <<EOF >/dev/null
 {
@@ -158,9 +154,13 @@ tee /tmp/www.website.json <<EOF >/dev/null
 }
 EOF
 
-aws s3api put-bucket-website --bucket "www.${DOMAIN}" --website-configuration file:///tmp/website.json
+aws s3api put-bucket-website --bucket "www.${DOMAIN}" \
+  --website-configuration file:///tmp/www.website.json
 
-echo "s3 domain: http://${DOMAIN}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com"
+REGION=$(aws s3api get-bucket-location --bucket ${DOMAIN} \
+  --query 'LocationConstraint' --output text)
+
+echo "s3 domain: http://${DOMAIN}.s3-website.${REGION}.amazonaws.com"
 
 # couldfront
 
@@ -264,8 +264,10 @@ EOF
     --default-root-object index.html
     --query 'Id' --text)
 
-  CLOUDFRONT_DOMAIN=$(aws cloudfront get-distribution --id ${DISTRIBUTION_ID} --query 'Distribution.DomainName')
+  CLOUDFRONT_DOMAIN=$(aws cloudfront get-distribution \
+    --id ${DISTRIBUTION_ID} --query 'Distribution.DomainName')
 
   echo "cloudfront domain: ${CLOUDFRONT_DOMAIN}"
+  echo "NOTE! Now you have to wait a lot for cloudfront to be ready!"
 
 fi

@@ -1,7 +1,6 @@
 #!bin/sh
 
-set -x
-set -e
+set -ex
 
 for i in "$@"
 do

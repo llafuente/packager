@@ -85,6 +85,7 @@ curl -s "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
 sudo python get-pip.py
 pip -V
 sudo pip install awscli
+sudo pip install pygments
 
 # install gohugo.io
 # releases at: https://github.com/spf13/hugo/releases

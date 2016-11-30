@@ -7,8 +7,8 @@ source ./utils.sh
 aws_prerequisites
 
 # configuration
-
-#VOLUME_ID="vol-???"
+# restore this volume!
+# VOLUME_ID="vol-???"
 
 # end of configuration
 
@@ -25,7 +25,7 @@ export INSTANCE_ID=$(aws ec2 run-instances \
   --instance-type t2.micro \
   --region ${AWS_DEFAULT_REGION} --placement AvailabilityZone=${AWS_AVAILABILITY_ZONE} \
   --key-name ${AWS_CLIENT_PEM} \
-  --security-groups webserver dbserver administrable \
+  --security-groups ec2 webserver dbserver administrable \
   --query 'Instances[0].InstanceId' --output text)
 
 aws_wait_instance
@@ -34,11 +34,13 @@ aws ec2 create-tags --resources ${INSTANCE_ID} --tags "Key=Name,Value=webserver0
 
 VOLUME_INSTANCE_ID=$(aws ec2 describe-instances \
   --filters "Name=instance-id,Values=${INSTANCE_ID}" \
-  | node -e "require('curt').stdin((x) => { stdout(_.map(x.Reservations[0].Instances[0].BlockDeviceMappings, 'Ebs.VolumeId').join(' ')); }, 'json')")
+  --query 'Reservations[0].Instances[0].BlockDeviceMappings[*].Ebs.VolumeId' --output text
+#  | node -e "require('curt').stdin((x) => { stdout(_.map(x.Reservations[0].Instances[0].BlockDeviceMappings, 'Ebs.VolumeId').join(' ')); }, 'json')")
 
 aws_get_instance_ip
 
 if [ -z "${VOLUME_ID}" ]; then
+  echo "Create volume"
   export VOLUME_ID=$(aws ec2 create-volume \
     --size 5 \
     --region ${AWS_DEFAULT_REGION} --availability-zone ${AWS_AVAILABILITY_ZONE} \
@@ -84,11 +86,10 @@ ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < \
 
 
 #mark volumes for backup
-
 aws ec2 create-tags --resources ${VOLUME_INSTANCE_ID} --tags "Key=backup,Value=weekly"
-aws ec2 create-tags --resources ${VOLUMES_ID} --tags "Key=backup,Value=daily"
+aws ec2 create-tags --resources ${VOLUME_ID} --tags "Key=backup,Value=daily"
 aws ec2 create-tags --resources ${VOLUME_INSTANCE_ID} --tags "Key=format,Value=xfs"
-aws ec2 create-tags --resources ${VOLUMES_ID} --tags "Key=format,Value=xfs"
-aws ec2 create-tags --resources ${VOLUMES_ID} --tags "Key=mariadb,Value=true"
+aws ec2 create-tags --resources ${VOLUME_ID} --tags "Key=format,Value=xfs"
+aws ec2 create-tags --resources ${VOLUME_ID} --tags "Key=mariadb,Value=true"
 
 echo "OK"

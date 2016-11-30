@@ -3,20 +3,21 @@
 set -x
 set -e
 
-if [ -z ${AWS_CLIENT_ID} ]; then
-  echo "export credentials first!"
-  echo "KO"
-  exit 1
-fi
+# TODO param for: vpc-config SubnetIds="subnet-7aee3012"
 
-# AWS_IAM_ROLE=$(aws iam get-user --user-name lambda-cronuser \
+# IAM_ROLE_CRONUSER=$(aws iam get-user --user-name lambda-cronuser \
 #  | node -e "require('curt').stdin_get('User.Arn')")
 
-AWS_IAM_ROLE=$(aws iam get-role --role-name role-lambda-cronuser \
+IAM_ROLE_CRONUSER=$(aws iam get-role --role-name role-lambda-cronuser \
   --query 'Role.Arn' --output text)
 
+SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --group-names lambda \
+  --query 'SecurityGroups[0].GroupId' --output text)
 
 COUNTER=0
+
+# pure cron functions (no ec2 interaction)
+
 for FUNCTION in "create-snapshots" "delete-snapshots";
 do
   COUNTER=$(($COUNTER + 1))
@@ -30,7 +31,7 @@ do
   aws lambda delete-function --function-name "${FUNCTION}" || echo "Ignore error"
 
   FUNCTION_ARN=$(aws lambda create-function --function-name "${FUNCTION}" --runtime nodejs4.3 \
-    --role "${AWS_IAM_ROLE}" --handler "${FUNCTION}.handler" \
+    --role "${IAM_ROLE_CRONUSER}" --handler "${FUNCTION}.handler" \
     --zip-file "fileb://${ZIP}" \
     --description ${FUNCTION} \
     --query 'FunctionArn' --output text)
@@ -66,3 +67,27 @@ done
 
 # test
 # aws lambda invoke --function-name delete-snapshots --payload '{"hello":"world"}'
+
+# VPC functions
+
+for FUNCTION in "ssh-test"
+do
+  COUNTER=$(($COUNTER + 1))
+  ZIP="${FUNCTION}.zip"
+
+  zip -9 -q -r ${ZIP} "${FUNCTION}.js" package.json node_modules
+
+  aws lambda delete-function --function-name "${FUNCTION}" || echo "Ignore error"
+
+  FUNCTION_ARN=$(aws lambda create-function --function-name "${FUNCTION}" --runtime nodejs4.3 \
+    --role "${IAM_ROLE_CRONUSER}" --handler "${FUNCTION}.handler" \
+    --zip-file "fileb://${ZIP}" \
+    --description ${FUNCTION} \
+    --vpc-config SubnetIds="subnet-7aee3012",SecurityGroupIds="${SECURITY_GROUP_ID}" \
+    --timeout 60 \
+    --query 'FunctionArn' --output text)
+
+  echo "Function ARN: ${FUNCTION_ARN}"
+
+  rm ${ZIP}
+done

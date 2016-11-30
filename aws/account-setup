@@ -19,14 +19,42 @@ chmod 400 ~/.ssh/${AWS_CLIENT_PEM}.pem
 # aws ec2 describe-key-pairs --key-name $AWS_CLIENT_PEM
 
 echo "Create & Configure security groups"
+aws ec2 create-security-group --group-name ec2 --description "ec2 servers"
 aws ec2 create-security-group --group-name webserver --description "open port 80/443"
 aws ec2 create-security-group --group-name dbserver --description "open port 3306"
 aws ec2 create-security-group --group-name administrable --description "open everything to admin ips"
+aws ec2 create-security-group --group-name lambda --description "open port 22"
 
 aws ec2 authorize-security-group-ingress --group-name dbserver --protocol tcp --port 3306 --source-group webserver
 
 aws ec2 authorize-security-group-ingress --group-name webserver --protocol tcp --port 80 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-name webserver --protocol tcp --port 443 --cidr 0.0.0.0/0
+
+# authorize lamnda to call ec2 servers via ssh
+LAMBDA_GROUP_ID=$(aws ec2 describe-security-groups --group-names lambda \
+  --query 'SecurityGroups[0].GroupId' --output text)
+# TODO webserver & dbserver should be removed asap, when new ec2 group enters in prod
+for GROUP_NAME in "ec2" "webserver" "dbserver";
+do
+  GROUP_ID=$(aws ec2 describe-security-groups --group-names "${GROUP_NAME}" \
+    --query 'SecurityGroups[0].GroupId' --output text)
+
+  tee /tmp/json <<EOF >/dev/null
+  [{
+    "IpProtocol": "tcp",
+    "FromPort": 22,
+    "ToPort": 22,
+    "UserIdGroupPairs": [{
+      "GroupId": "${GROUP_ID}"
+    }]
+  }]
+EOF
+  aws ec2 authorize-security-group-ingress --group-name ${GROUP_NAME}  --protocol tcp --port 22 --source-group lambda
+
+  aws ec2 authorize-security-group-egress \
+    --group-id ${LAMBDA_GROUP_ID} \
+    --ip-permissions file:///tmp/json
+done
 
 echo "Create lambda role for cron operations"
 aws iam create-role \
@@ -101,3 +129,9 @@ aws iam create-instance-profile \
 aws iam add-role-to-instance-profile \
   --instance-profile-name profile-logrotate \
   --role-name role-logrotate
+
+# key-value database for lambda storage
+aws dynamodb create-table --table-name lambda \
+  --attribute-definitions AttributeName=id,AttributeType=S \
+  --key-schema AttributeName=id,KeyType=HASH \
+  --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1

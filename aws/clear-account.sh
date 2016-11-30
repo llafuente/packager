@@ -119,3 +119,11 @@ do
   aws events   remove-targets --rule ${RULE_NAME} --ids "${IDS}"
   aws events delete-rule --name ${RULE_NAME}
 done
+
+
+
+DYNAMODB_TABLES=$(aws dynamodb list-tables --query 'TableNames' --output text)
+for TABLE in ${DYNAMODB_TABLES};
+do
+  aws dynamodb delete-table --table-name ${TABLE}
+done

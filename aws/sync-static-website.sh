@@ -45,16 +45,25 @@ fi
 IS_COMPRESSED=$(file "${SOURCE}/index.html" | grep 'gzip')
 
 # do not re-compress
-if [ -z ${IS_COMPRESSED} ]; then
+if [ -z "${IS_COMPRESSED}" ]; then
   echo "compressing source path"
+  set -e # be sure everything is OK with minification & gzip-ing
 
   # minify
-  find ${SOURCE} -name '*.html' | xargs -I '{}' sh -c "html-minifier --collapse-whitespace --remove-tag-whitespace '{}' | sponge '{}'"
-  # gzip
-  find ${SOURCE} | xargs gzip -9
+    HTMLS=$(find ${SOURCE} -name '*.html')
+    for FILE in ${HTMLS};
+    do
+      echo "minify ${FILE}"
+      html-minifier --collapse-whitespace --remove-tag-whitespace "${FILE}" | sponge "${FILE}"
+    done
+
+  # gzip files
+  find ${SOURCE} -type f | xargs gzip -9
   # rename .*.gz .*
   find ${SOURCE} -type f -name '*.gz' | \
     while read f; do mv "$f" "${f%.gz}"; done
+
+  set +e
 fi
 
 # sync files

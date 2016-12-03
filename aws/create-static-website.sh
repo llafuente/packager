@@ -20,6 +20,9 @@ case $i in
   --cloudfront)
     CLOUDFRONT="yes";
   ;;
+  --root-redirect)
+    SWAP=1;
+  ;;
   *)
     # unknown option
   ;;
@@ -38,6 +41,16 @@ if [ -z ${DOMAIN} ]; then
   echo "KO"
   exit 1
 fi
+
+if [ -z ${SWAP} ]; then
+  DOMAIN_A=${DOMAIN}
+  DOMAIN_B="www.${DOMAIN}"
+else
+  DOMAIN_B=${DOMAIN}
+  DOMAIN_A="www.${DOMAIN}"
+fi
+
+
 
 # full list: "AllowedMethods": ["GET", "PUT", "POST", "DELETE"]
 tee /tmp/cors.json <<EOF >/dev/null
@@ -68,7 +81,7 @@ tee /tmp/policy.json <<EOF >/dev/null
          "Action": [
            "s3:GetObject"
           ],
-         "Resource": "arn:aws:s3:::${DOMAIN}/*"
+         "Resource": "arn:aws:s3:::${DOMAIN_A}/*"
       },
       {
          "Effect": "Allow",
@@ -76,7 +89,7 @@ tee /tmp/policy.json <<EOF >/dev/null
          "Action": [
            "s3:ListBucket"
           ],
-         "Resource": "arn:aws:s3:::${DOMAIN}"
+         "Resource": "arn:aws:s3:::${DOMAIN_A}"
       }
    ]
 }
@@ -91,7 +104,7 @@ tee /tmp/www.policy.json <<EOF >/dev/null
          "Action": [
            "s3:GetObject"
           ],
-         "Resource": "arn:aws:s3:::www.${DOMAIN}/*"
+         "Resource": "arn:aws:s3:::${DOMAIN_B}/*"
       },
       {
          "Effect": "Allow",
@@ -99,7 +112,7 @@ tee /tmp/www.policy.json <<EOF >/dev/null
          "Action": [
            "s3:ListBucket"
           ],
-         "Resource": "arn:aws:s3:::www.${DOMAIN}"
+         "Resource": "arn:aws:s3:::${DOMAIN_B}"
       }
    ]
 }
@@ -119,7 +132,7 @@ tee /tmp/website.json <<EOF >/dev/null
         "HttpErrorCodeReturnedEquals": "404"
       },
       "Redirect": {
-        "HostName": "${DOMAIN}",
+        "HostName": "${DOMAIN_A}",
         "ReplaceKeyPrefixWith": "#/"
       }
     }
@@ -128,39 +141,39 @@ tee /tmp/website.json <<EOF >/dev/null
 EOF
 
 # create bucket, cors, policy & website
-aws s3 mb "s3://${DOMAIN}"
-aws s3api put-bucket-cors --bucket ${DOMAIN} \
+aws s3 mb "s3://${DOMAIN_A}"
+aws s3api put-bucket-cors --bucket ${DOMAIN_A} \
   --cors-configuration file:///tmp/cors.json
-aws s3api put-bucket-policy --bucket ${DOMAIN} \
+aws s3api put-bucket-policy --bucket ${DOMAIN_A} \
   --policy file:///tmp/policy.json
-aws s3api put-bucket-website --bucket ${DOMAIN} \
+aws s3api put-bucket-website --bucket ${DOMAIN_A} \
   --website-configuration file:///tmp/website.json
 
-./sync-static-website.sh --source=${SOURCE} --domain=${DOMAIN}
+./sync-static-website.sh --source=${SOURCE} --domain=${DOMAIN_A}
 
-# create a dummy website for www.${DOMAIN}, redirect everything to non-www
-aws s3 mb "s3://www.${DOMAIN}"
-aws s3api put-bucket-policy --bucket "www.${DOMAIN}" \
+# create a dummy website for ${DOMAIN_B}, redirect everything to ${DOMAIN_A}
+aws s3 mb "s3://${DOMAIN_B}"
+aws s3api put-bucket-policy --bucket "${DOMAIN_B}" \
   --policy file:///tmp/www.policy.json
-aws s3api put-bucket-cors --bucket "www.${DOMAIN}" \
+aws s3api put-bucket-cors --bucket "${DOMAIN_B}" \
   --cors-configuration file:///tmp/cors.json
 
 tee /tmp/www.website.json <<EOF >/dev/null
 {
   "RedirectAllRequestsTo" : {
-    "HostName" : "${DOMAIN}",
+    "HostName" : "${DOMAIN_A}",
     "Protocol" : "${PROTOCOL}"
   }
 }
 EOF
 
-aws s3api put-bucket-website --bucket "www.${DOMAIN}" \
+aws s3api put-bucket-website --bucket "${DOMAIN_B}" \
   --website-configuration file:///tmp/www.website.json
 
-REGION=$(aws s3api get-bucket-location --bucket ${DOMAIN} \
+REGION=$(aws s3api get-bucket-location --bucket ${DOMAIN_A} \
   --query 'LocationConstraint' --output text)
 
-echo "s3 domain: http://${DOMAIN}.s3-website.${REGION}.amazonaws.com"
+echo "s3 domain: http://${DOMAIN_A}.s3-website.${REGION}.amazonaws.com"
 
 # couldfront
 
@@ -189,8 +202,8 @@ if [ ! -z ${CLOUDFRONT} ]; then
                 "CustomHeaders": {
                     "Quantity": 0
                 },
-                "Id": "S3-${DOMAIN}",
-                "DomainName": "${DOMAIN}.s3.amazonaws.com"
+                "Id": "S3-${DOMAIN_A}",
+                "DomainName": "${DOMAIN_A}.s3.amazonaws.com"
             }
         ],
         "Quantity": 1
@@ -203,7 +216,7 @@ if [ ! -z ${CLOUDFRONT} ]; then
             "Enabled": false,
             "Quantity": 0
         },
-        "TargetOriginId": "S3-${DOMAIN}",
+        "TargetOriginId": "S3-${DOMAIN_A}",
         "ViewerProtocolPolicy": "allow-all",
         "ForwardedValues": {
             "Headers": {
@@ -260,7 +273,7 @@ if [ ! -z ${CLOUDFRONT} ]; then
 EOF
 
   DISTRIBUTION_ID=$(aws cloudfront create-distribution \
-    --origin-domain-name "${DOMAIN}.s3.amazonaws.com" \
+    --origin-domain-name "${DOMAIN_A}.s3.amazonaws.com" \
     --default-root-object index.html
     --query 'Id' --text)
 

@@ -92,4 +92,7 @@ sudo pip install pygments
 wget -O hugo.deb https://github.com/spf13/hugo/releases/download/v0.17/hugo_0.17-64bit.deb
 sudo dpkg -i hugo.deb
 
+# sponge
+sudo apt install moreutils
+
 sh packages/dotfiles.sh

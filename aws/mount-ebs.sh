@@ -65,4 +65,18 @@ do
   fi
 done
 
+if [ ! -z $(which mongo) ]; then
+  echo "moving mongo data to ebs"
+
+  sudo systemctl stop mongod
+
+  sudo cp -R -p /var/lib/mongo /media/${MOUNT}/mongo
+  sudo mv /var/lib/mongo /var/lib/mongo.back
+  sudo ln -sf /media/${MOUNT}/mongo /var/lib/mongo
+
+  sudo systemctl start mongod
+fi
+
+
+
 echo "OK"

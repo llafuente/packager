@@ -10,6 +10,7 @@ sudo yum install -y monit
 sudo cp -rf "${INSTALLER_PATH}/monit/mariadb" /etc/monit.d/mariadb
 sudo cp -rf "${INSTALLER_PATH}/monit/nginx" /etc/monit.d/nginx
 sudo cp -rf "${INSTALLER_PATH}/monit/php-fpm" /etc/monit.d/php-fpm
+sudo cp -rf "${INSTALLER_PATH}/monit/mongodb" /etc/monit.d/mongodb
 
 
 cat <<DELIM | sudo tee /etc/yum.repos.d/MariaDB.repo

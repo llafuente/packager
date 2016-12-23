@@ -4,3 +4,4 @@ check process nginx
   stop program = "/usr/bin/systemctl stop nginx.service"
   if failed host localhost port 80 then restart
   if memory usage > 70% for 5 cycles then restart
+  if total cpu > 90% for 5 cycles then restart

@@ -1,0 +1,10 @@
+check process mongodb
+  with pidfile /var/run/mongodb/mongod.pid
+  start program = "/bin/systemctl start mongod"
+  stop program = "/bin/systemctl stop mongod"
+  if failed host 127.0.0.1 port 28017 protocol http
+    and request "/" with timeout 10 seconds then restart
+  if memory usage > 70% for 5 cycles then restart
+  if cpu > 70% for 5 cycles then restart
+  if total cpu > 90% for 5 cycles then restart
+  if 5 restarts within 5 cycles then timeout

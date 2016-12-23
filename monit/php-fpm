@@ -3,3 +3,4 @@ check process php-fpm
   start program = "/usr/bin/systemctl start php-fpm.service"
   stop program = "/usr/bin/systemctl stop php-fpm.service"
   if memory usage > 60% for 5 cycles then restart
+  if total cpu > 90% for 5 cycles then restart

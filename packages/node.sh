@@ -34,9 +34,10 @@ cd /tmp/node/
 if [ "${MODE}" -eq "legacy" ]; then
   wget -O node.tar.gz https://nodejs.org/dist/v0.10.40/node-v0.10.40-linux-x64.tar.gz
 elif [ "${MODE}" -eq "lts" ]; then
-  wget -O node.tar.gz https://nodejs.org/dist/v4.4.5/node-v4.4.5-linux-x64.tar.gz
+  #wget -O node.tar.gz https://nodejs.org/dist/v4.4.5/node-v4.4.5-linux-x64.tar.gz
+  wget -O node.tar.gz https://nodejs.org/dist/v6.9.2/node-v6.9.2-linux-x64.tar.gz
 else
-  wget -O node.tar.gz https://nodejs.org/dist/v6.9.1/node-v6.9.1-linux-x64.tar.gz
+  wget -O node.tar.gz https://nodejs.org/dist/v7.2.1/node-v7.2.1-linux-x64.tar.gz
 fi
 
 tar xsfv node.tar.gz > /dev/null

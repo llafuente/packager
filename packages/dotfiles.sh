@@ -16,7 +16,7 @@ else
 
   git clone https://github.com/llafuente/dotfiles.git
 
-  for i in `find dotfiles/ -type f -not -path "dotfiles/.git/*" -not -path "dotfiles/tutorials/*" -not -path "dotfiles/bin/*" | cut -c10-`;
+  for i in `find ${HOME}/dotfiles/ -type f -not -path "${HOME}/dotfiles/.git/*" -not -path "${HOME}/dotfiles/tutorials/*" -not -path "${HOME}/dotfiles/bin/*" | cut -c10-`;
   do
     dir=`dirname $i`
 
@@ -35,11 +35,11 @@ else
       rm -f "${i}"
     fi
 
-    ln -sf "dotfiles/${i}" "${i}"
+    ln -sf "${HOME}/${HOME}/dotfiles/${i}" "${i}"
 
   done
 
-  for i in `find dotfiles/bin -type f`;
+  for i in `find ${HOME}/dotfiles/bin -type f`;
   do
     bin=`basename $i`
     echo "link program: ${i} as ${bin}";
@@ -48,5 +48,14 @@ else
     sudo ln -sf "${HOME}/${i}" "/usr/local/bin/${bin}"
   done
 fi
+
+# my terminator/sublime config requires this font
+cd /tmp
+wget -O AnonymousPro.zip http://www.marksimonson.com/assets/content/fonts/AnonymousPro-1.002.zip
+unzip AnonymousPro.zip
+rm AnonymousPro.zip
+
+sudo mv AnonymousPro* /usr/share/fonts/truetype/AnonymousPro
+
 
 echo "OK"

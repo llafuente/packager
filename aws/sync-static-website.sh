@@ -72,9 +72,16 @@ aws s3 sync \
   --content-encoding gzip \
   --exclude "*" --include "*.html" \
   "${SOURCE}" "s3://${DOMAIN}"
+# xml: no cache
+aws s3 sync \
+  --content-encoding gzip \
+  --exclude "*" --include "*.xml" \
+  --content-type "application/xml" \
+  "${SOURCE}" "s3://${DOMAIN}"
+
 # rest of files ensure cache!
 aws s3 sync \
   --content-encoding gzip \
   --cache-control "max-age=2592000" --acl "public-read" --sse "AES256" \
-  --exclude "*.html" \
+  --exclude "*.html" --exclude "*.xml" \
   "${SOURCE}" "s3://${DOMAIN}"

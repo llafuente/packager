@@ -1,7 +1,7 @@
 #!/bin/sh
-# ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < \
-# sh wordpress-plugin.sh --url=https://downloads.wordpress.org/plugin/xxx.zip \
-# -- target-dir=xxx
+#ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < \
+# ./wordpress-plugin.sh --url=https://downloads.wordpress.org/plugin/social-pug.zip \
+# -- target-dir=/var/www/html/e-scenario/
 
 set -ex
 

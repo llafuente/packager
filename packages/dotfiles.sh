@@ -14,28 +14,32 @@ if [ -d "${HOME}/dotfiles" ]; then
 else
   # create
 
+  #rm -rf dotfiles
   git clone https://github.com/llafuente/dotfiles.git
 
-  for i in `find ${HOME}/dotfiles/ -type f -not -path "${HOME}/dotfiles/.git/*" -not -path "${HOME}/dotfiles/tutorials/*" -not -path "${HOME}/dotfiles/bin/*" | cut -c10-`;
+  DOTFILES=${HOME}/dotfiles
+  for SRC in `find ${DOTFILES} -type f -not -path "${DOTFILES}/.git/*" -not -path "${DOTFILES}/tutorials/*" -not -path "${DOTFILES}/bin/*"`;
   do
-    dir=`dirname $i`
+    DST=$(echo $SRC |cut -c$((${#HOME} + 11))-)
 
-    echo "path: ${dir} | file: ${i}";
+    echo "SRC ${SRC} DST ${DST}"
 
-    if [ "${dir}" != "." ]
+    DIR=`dirname $DST`
+
+    if [ "${DIR}" != "." ]
     then
-      mkdir -p ${dir}
+      mkdir -p ${DIR}
     fi
 
     # do not backup and relink a symlink
-    if [ -e $i -a ! -L $i ]
+    if [ -e $DST -a ! -L $DST ]
     then
 
-      cp -f "${i}" "${i}.bak"
-      rm -f "${i}"
+      cp -f "${DST}" "${DST}.bak"
+      rm -f "${DST}"
     fi
 
-    ln -sf "${HOME}/${HOME}/dotfiles/${i}" "${i}"
+    ln -sf "${SRC}" "${DST}"
 
   done
 
@@ -45,7 +49,7 @@ else
     echo "link program: ${i} as ${bin}";
     chmod 755 ${i}
     sudo rm -f "/usr/local/bin/${bin}"
-    sudo ln -sf "${HOME}/${i}" "/usr/local/bin/${bin}"
+    sudo ln -sf "${i}" "/usr/local/bin/${bin}"
   done
 fi
 

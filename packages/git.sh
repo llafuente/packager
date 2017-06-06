@@ -19,4 +19,7 @@ sudo make install install-doc install-html
 git config --global user.name "llafuente"
 git config --global user.email "llafuente@noboxout.com"
 
+sudo yum -y install gitflow
+
+
 echo "OK"

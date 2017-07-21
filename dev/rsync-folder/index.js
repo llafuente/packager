@@ -3,8 +3,7 @@ const spawn = require('child_process').spawn;
 const pjoin = require('path').join;
 const prelative = require("path").relative;
 
-// cd ~/Desktop//Desktop/rauldelacruz.es/; node ~/vagrant/sv/rsync-folder.js ~/.ssh/aws-delacruzcafe.pem 'ec2-user@ec2-52-28-178-158.eu-central-1.compute.amazonaws.com' '/var/www/html/rauldelacruz.es/'
-// node rsync-folder.js ~/.ssh/aws-delacruzcafe.pem 'ec2-user@52.57.67.55' '/var/www/html/'
+// node ~/packager/dev/rsync-folder.js  ~/.ssh/${AWS_CLIENT_PEM}.pem 'ec2-user@${INSTANCE_IP}' '/var/www/html/'
 
 /*
 
@@ -38,6 +37,8 @@ setTimeout(function() {
 console.log('pem_file', pem_file);
 console.log('remote_user_host', remote_user_host);
 console.log('remote_path', remote_path);
+
+console.log('first rsync', `rsync -avz -e "ssh -i ${pem_file}" ${process.cwd()} ${remote_user_host}:${remote_path}`);
 
 chokidar.watch('.', {
   ignored: /[\/\\]\./

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -exuo pipefail
 
 for i in "$@"
 do

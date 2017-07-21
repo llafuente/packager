@@ -1,5 +1,7 @@
 #!bin/sh
 
+set -exuo pipefail
+
 cd /tmp
 git clone git@github.com:libuv/libuv.git
 cd libuv

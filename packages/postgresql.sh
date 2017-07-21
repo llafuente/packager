@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -exuo pipefail
+
 # from http://www.unixmen.com/postgresql-9-4-released-install-centos-7/
 
 sudo rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm

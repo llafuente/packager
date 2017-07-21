@@ -1,17 +1,26 @@
-#!/bin/bash
+#!/bin/sh
+
+# declare utils functions
 
 function aws_prerequisites {
   if [ -z ${AWS_CLIENT_PEM} ]; then
     echo "undefined AWS_CLIENT_PEM"
-    echo "edit and execute set-global-vars.sh"
+    echo "edit and execute ~/.aws-profile"
     exit 1
   fi
+  if [ -z ${INSTALLER_ROOT} ]; then
+    echo "undefined INSTALLER_ROOT"
+    echo "edit and execute ~/.aws-profile"
+    exit 1
+  fi
+  
 }
 
 function aws_get_instance_ip {
   export INSTANCE_IP=$(aws ec2 describe-instances \
     --filters "Name=instance-id,Values=${INSTANCE_ID}" \
     --query 'Reservations[0].Instances[0].PublicDnsName' --output text)
+  echo "INSTANCE_IP=${INSTANCE_IP}"
 }
 
 function aws_add_to_known_hosts {

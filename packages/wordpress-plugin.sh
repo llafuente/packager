@@ -3,7 +3,7 @@
 # ./wordpress-plugin.sh --url=https://downloads.wordpress.org/plugin/social-pug.zip \
 # -- target-dir=/var/www/html/e-scenario/
 
-set -ex
+set -exuo pipefail
 
 for i in "$@"
 do

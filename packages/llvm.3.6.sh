@@ -1,3 +1,7 @@
+#!/bin/sh
+
+set -exuo pipefail
+
 yum groupinstall "Development Tools"
 yum install -y zlib-dev openssl-devel sqlite-devel bzip2-devel xz-libs cmake libffi-devel
 

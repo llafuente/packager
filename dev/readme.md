@@ -10,5 +10,5 @@ Keep a remote folder updated using rsync.
 Usage:
 
 ```
-node rsync-folder.js ~/.ssh/key.pem 'ec2-user@000.000.000.000' '/var/www/html/xxxx/'
+node rsync-folder/index.js ~/.ssh/key.pem 'ec2-user@000.000.000.000' '/var/www/html/xxxx/'
 ```

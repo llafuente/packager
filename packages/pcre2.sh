@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -exuo pipefail
+
 cd /tmp
 rm -rf pcre2
 svn co svn://vcs.exim.org/pcre2/code/trunk pcre2

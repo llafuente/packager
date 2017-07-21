@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -exuo pipefail
+
 # centos 7 don't have firewalld service in minimal distro
 sudo yum install -y firewalld
 

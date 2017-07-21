@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # credits - https://cloudonaut.io/diy-aws-security-review/
 

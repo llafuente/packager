@@ -1,6 +1,6 @@
 #!/bin/sh
 
-
+set -exuo pipefail
 
 sudo service mysqld stop
 # sometimes do not stop... use the force!!!

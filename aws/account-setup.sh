@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # steps
 # `aws configure`
@@ -6,9 +6,9 @@
 # `sh set-global-vars.sh`
 # initial setup for my aws clients
 
-set -ex
+set -exuo pipefail
 
-source "$(dirname "$0")/../utils.sh"
+source "$(dirname "$0")/utils.sh"
 aws_prerequisites
 
 echo "Using account: ${AWS_CLIENT_ID}"

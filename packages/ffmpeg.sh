@@ -1,4 +1,7 @@
 #!/bin/sh
+
+set -exuo pipefail
+
 # from http://wiki.razuna.com/display/ecp/FFMpeg+Installation+on+CentOS+and+RedHat
 
 rpm -Uhv http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm

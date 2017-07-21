@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -exuo pipefail
+
 cat <<DELIM | sudo tee -a /etc/yum.repos.d/mongodb.repo
 [mongodb]
 name=MongoDB Repository
@@ -31,3 +33,9 @@ sudo chkconfig mongod on
 # exception in initAndListen: 15926 Insufficient free space for journals, terminating
 #
 # run the mongodb part of: aws/mount-ebs.sh
+
+#mongod -v
+
+sudo service mongod status
+
+echo "OK"

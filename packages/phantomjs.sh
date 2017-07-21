@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -exuo pipefail
+
 sudo yum install -y fontconfig freetype libfreetype.so.6 libfontconfig.so.1 libstdc++.so.6
 yum install urw-fonts
 

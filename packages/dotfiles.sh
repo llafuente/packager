@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -exuo pipefail
+
 # vim is my git editor
 sudo yum install -y openssl vim
 

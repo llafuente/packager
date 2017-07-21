@@ -1,5 +1,6 @@
 #!/bin/sh
 
+set -exuo pipefail
 
 cat <<DELIM | sudo tee /etc/sysconfig/clock
 ZONE="GMT"

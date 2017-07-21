@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -exuo pipefail
 
 echo "downloading flex"
 cd /tmp

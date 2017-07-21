@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -exuo pipefail
+
 cd /tmp
 # wget https://ecsft.cern.ch/dist/cling/current/cling-Fedora20-x86_64-4b08f20793.tar.bz2
 wget https://ecsft.cern.ch/dist/cling/current/cling-Fedora20-x86_64-13218860da.tar.bz2

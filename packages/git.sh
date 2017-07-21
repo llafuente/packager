@@ -1,5 +1,14 @@
 #!/bin/sh
 
+set -exuo pipefail
+
+# git install is long, check before...
+GIT_VERSION=$(git --version || echo "git not found")
+if [ "${GIT_VERSION}" == "git version 1.9.5" ]; then
+  echo "OK"
+  exit 0
+fi
+
 sudo yum -y groupinstall "Development Tools"
 sudo yum -y install zlib-devel perl-ExtUtils-MakeMaker asciidoc xmlto openssl-devel unzip
 

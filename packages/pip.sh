@@ -1,7 +1,6 @@
 #!/bin/sh
 
-set -x
-set -e
+set -exuo pipefail
 
 sudo yum install -y python
 

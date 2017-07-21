@@ -1,6 +1,17 @@
-#!bin/sh
+{{< highlight bash >}}
+### for a single command
+your-failure-command || echo
 
-set -ex
+
+### for multiline / zones
+
+set +e
+your-failure-command
+your-failure-command2
+set -e
+{{< /highlight >}}#!bin/sh
+
+set -exuo pipefail
 
 for i in "$@"
 do
@@ -36,7 +47,7 @@ fi
 sudo mount /dev/${DEVICE} /media/${MOUNT}
 
 
-if [ ! -z $(which mysql) ]; then
+if [ -x "$(command -v mysql)" ] && [ ! -h /var/lib/mysql ]; then
   echo "moving mysql data to ebs"
 
   sudo systemctl stop mariadb
@@ -59,13 +70,14 @@ fi
 sudo mkdir -p /media/${MOUNT}/log
 for LOG_FOLDER in "nginx" "mysql" "php-fpm";
 do
-  if [ ! -h /var/log/${LOG_FOLDER} ]; then
+  echo "moving log data to ebs"
+  if [ -d "/var/log/${LOG_FOLDER}" ] && [ ! -h "/var/log/${LOG_FOLDER}" ]; then
     sudo mv /var/log/${LOG_FOLDER} /media/${MOUNT}/log/${LOG_FOLDER}
     sudo ln -sf /media/${MOUNT}/log/${LOG_FOLDER} /var/log/${LOG_FOLDER}
   fi
 done
 
-if [ ! -z $(which mongo) ]; then
+if [ -x "$(command -v mongo)" ] && [ ! -h /var/lib/mongo ]; then
   echo "moving mongo data to ebs"
 
   sudo systemctl stop mongod

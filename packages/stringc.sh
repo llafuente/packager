@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -exuo pipefail
+
 cd /tmp
 rm -rf string.c
 git clone https://github.com/llafuente/string.c.git

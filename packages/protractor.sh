@@ -1,7 +1,8 @@
 #!/bin/sh
 
-npm install -g webdriver-manager
-npm install -g protractor
+set -exuo pipefail
+
+npm install -g webdriver-manager protractor
 webdriver-manager update --standalone
 
 # Usage

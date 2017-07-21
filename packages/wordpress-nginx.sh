@@ -1,8 +1,7 @@
 #!/bin/sh
 # sh wordpress-nginx.sh --target-dir=/var/www/html/wp0 --domain=example.com
 
-set -x
-set -e
+set -exuo pipefail
 
 SSL=0
 

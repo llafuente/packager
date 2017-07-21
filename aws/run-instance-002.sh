@@ -1,7 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-set -e
-set -x
+set -exuo pipefail
 
 source ./utils.sh
 aws_prerequisites
@@ -30,11 +29,11 @@ export INSTANCE_ID=$(aws ec2 run-instances \
 
 aws_wait_instance
 
-aws ec2 create-tags --resources ${INSTANCE_ID} --tags "Key=Name,Value=webserver01"
+aws ec2 create-tags --resources ${INSTANCE_ID} --tags "Key=Name,Value=webserver02"
 
 VOLUME_INSTANCE_ID=$(aws ec2 describe-instances \
   --filters "Name=instance-id,Values=${INSTANCE_ID}" \
-  --query 'Reservations[0].Instances[0].BlockDeviceMappings[*].Ebs.VolumeId' --output text
+  --query 'Reservations[0].Instances[0].BlockDeviceMappings[*].Ebs.VolumeId' --output text)
 #  | node -e "require('curt').stdin((x) => { stdout(_.map(x.Reservations[0].Instances[0].BlockDeviceMappings, 'Ebs.VolumeId').join(' ')); }, 'json')")
 
 aws_get_instance_ip
@@ -56,40 +55,23 @@ ssh_until_sucesss
 
 export SSH_FILE="ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP}"
 
-ssh -tt -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s -x -e" -- < \
-  ../packages/prepare-instance.sh
+ssh -tt -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < \
+  ${INSTALLER_ROOT}/packages/prepare-instance.sh
 
-ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "mkdir -p /home/ec2-user/installer/"
-#scp -i ~/.ssh/${AWS_CLIENT_PEM}.pem -pr ../ ec2-user@${INSTANCE_IP}:/home/ec2-user/installer/
-rsync -qazvv -e "ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem" ../ ec2-user@${INSTANCE_IP}:/home/ec2-user/installer/
+ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "mkdir -p /home/ec2-user/packager/"
 
-for SH_FILE in "disable-selinux.sh" "node.sh" "git.sh" "dotfiles.sh" "ntp.sh" "nginx.sh" "mariadb.sh" "nginx-php.sh";
+rsync -qazvv -e "ssh -i ${HOME}/.ssh/${AWS_CLIENT_PEM}.pem" ${INSTALLER_ROOT} ec2-user@${INSTANCE_IP}:/home/ec2-user/packager/
+
+for SH_FILE in "disable-selinux.sh" "node.sh" "git.sh" "dotfiles.sh" "ntp.sh" "mongodb.sh" "ruby.sh";
 do
   echo "** Installing: ${SH_FILE}"
   ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < \
-    ../packages/${SH_FILE}
+    ${INSTALLER_ROOT}/packages/${SH_FILE}
 done
-
-ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < \
-  ../packages/wordpress.sh \
-  --db-name=wordpress \
-  --db-user=wordpress \
-  --target-dir=/var/www/html/wp0
-
-ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < \
-  ../packages/wordpress-nginx.sh \
-  --target-dir=/var/www/html/wp0 \
-  --domain=example.com
 
 ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "bash -s" -- < \
   ./mount-ebs.sh --device=xvdf
 
-
-#mark volumes for backup
-aws ec2 create-tags --resources ${VOLUME_INSTANCE_ID} --tags "Key=backup,Value=weekly"
-aws ec2 create-tags --resources ${VOLUME_ID} --tags "Key=backup,Value=daily"
-aws ec2 create-tags --resources ${VOLUME_INSTANCE_ID} --tags "Key=format,Value=xfs"
-aws ec2 create-tags --resources ${VOLUME_ID} --tags "Key=format,Value=xfs"
-aws ec2 create-tags --resources ${VOLUME_ID} --tags "Key=mariadb,Value=true"
+aws ec2 create-tags --resources ${VOLUME_ID} --tags "Key=mongodb,Value=true"
 
 echo "OK"

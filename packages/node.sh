@@ -1,7 +1,6 @@
 #!/bin/sh
 
-set -x
-set -e
+set -exuo pipefail
 
 MODE="legacy"
 for i in "$@"

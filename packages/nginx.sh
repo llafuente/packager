@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -exuo pipefail
 
 sudo yum install -y epel-release
 sudo yum install -y nginx

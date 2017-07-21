@@ -1,11 +1,12 @@
-#!/bin/bash
+#!/bin/sh
 
 set -ex
 
 source "$(dirname "$0")/../utils.sh"
 aws_prerequisites
 
-MY_IP=$(wget http://ipinfo.io/ip -qO -)
+#MY_IP=$(wget http://ipinfo.io/ip -qO -)
+MY_IP=$(curl -q http://ipinfo.io/ip)
 
 echo "My ip: ${MY_IP}"
 
@@ -29,5 +30,7 @@ fi
 aws ec2 authorize-security-group-ingress --group-name administrable --protocol tcp --port 22 --cidr ${MY_IP}/32
 aws ec2 authorize-security-group-ingress --group-name administrable --protocol tcp --port 2812 --cidr ${MY_IP}/32
 
+
+aws ec2 authorize-security-group-ingress --group-name administrable --protocol tcp --port 8080 --cidr ${MY_IP}/32
 
 echo "OK"

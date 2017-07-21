@@ -1,7 +1,6 @@
 #!/bin/sh
 
-set -x
-set -e
+set -exuo pipefail
 
 # TODO this may check what is installed in the machine, and add only what's needed
 

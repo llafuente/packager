@@ -1,9 +1,8 @@
 #!/bin/sh
 
-# PHP 7.0.11 + FPM
+set -exuo pipefail
 
-set -x
-set -e
+# PHP 7.0.11 + FPM
 
 #sudo yum install -y php php-mysql php-fpm
 

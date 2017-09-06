@@ -13,26 +13,32 @@ aws_prerequisites
 
 echo "Using account: ${AWS_CLIENT_ID}"
 
-echo "Create key pair: ${AWS_CLIENT_PEM}"
-aws ec2 create-key-pair --key-name $AWS_CLIENT_PEM --query 'KeyMaterial' --output text > ~/.ssh/${AWS_CLIENT_PEM}.pem
+if [ -f ~/.ssh/${AWS_CLIENT_PEM}.pem ]
+then
+  echo "Using key pair: ${AWS_CLIENT_PEM}"
+else
+  echo "Create key pair: ${AWS_CLIENT_PEM}"
+  aws ec2 create-key-pair --key-name $AWS_CLIENT_PEM --query 'KeyMaterial' --output text > ~/.ssh/${AWS_CLIENT_PEM}.pem  
+fi
+
 chmod 400 ~/.ssh/${AWS_CLIENT_PEM}.pem
 # aws ec2 describe-key-pairs --key-name $AWS_CLIENT_PEM
 
 echo "Create & Configure security groups"
-aws ec2 create-security-group --group-name ec2 --description "ec2 servers"
-aws ec2 create-security-group --group-name webserver --description "open port 80/443"
-aws ec2 create-security-group --group-name dbserver --description "open port 3306"
-aws ec2 create-security-group --group-name administrable --description "open everything to admin ips"
-aws ec2 create-security-group --group-name lambda --description "open port 22"
+# NOTE if the account is very old you may need to include --vpc-id
+# and lambda config may fail...
+EC2_GID=$(aws ec2 create-security-group --group-name ec2 --description "ec2 servers" --query GroupId --output text)
+WEBSERVER_GID=$(aws ec2 create-security-group --group-name webserver --description "open port 80/443" --query GroupId --output text)
+DBSERVER_GID=$(aws ec2 create-security-group --group-name dbserver --description "open port 3306" --query GroupId --output text)
+ADMINISTRABLE_GID=$(aws ec2 create-security-group --group-name administrable --description "open everything to admin ips" --query GroupId --output text)
+LAMBDA_GROUP_ID=$(aws ec2 create-security-group --group-name lambda --description "open port 22" --query GroupId --output text)
 
-aws ec2 authorize-security-group-ingress --group-name dbserver --protocol tcp --port 3306 --source-group webserver
+aws ec2 authorize-security-group-ingress --group-id ${DBSERVER_GID} --protocol tcp --port 3306 --source-group ${WEBSERVER_GID}
 
-aws ec2 authorize-security-group-ingress --group-name webserver --protocol tcp --port 80 --cidr 0.0.0.0/0
-aws ec2 authorize-security-group-ingress --group-name webserver --protocol tcp --port 443 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id ${WEBSERVER_GID} --protocol tcp --port 80 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id ${WEBSERVER_GID} --protocol tcp --port 443 --cidr 0.0.0.0/0
 
 # authorize lamnda to call ec2 servers via ssh
-LAMBDA_GROUP_ID=$(aws ec2 describe-security-groups --group-names lambda \
-  --query 'SecurityGroups[0].GroupId' --output text)
 # TODO webserver & dbserver should be removed asap, when new ec2 group enters in prod
 for GROUP_NAME in "ec2" "webserver" "dbserver";
 do

@@ -11,16 +11,8 @@ aws_prerequisites
 
 # end of configuration
 
-# ireland
-# CentOS 7.2 x86_64 with cloud-init (HVM) - ami-1f5dfe6c
-# CentOS 7.2 x86_64 with cloud-init (PV) - ami-0c5ffc7f
-# fankfurt
-# CentOS 7.2 x86_64 with cloud-init (PV) - ami-87d2ceeb
-# CentOS 7.2 x86_64 with cloud-init (HVM) - ami-96d2cefa
-
-#TODO  --iam-instance-profile profile-logrotate \
 export INSTANCE_ID=$(aws ec2 run-instances \
-  --image-id ami-96d2cefa \
+  --image-id $(get_ami) \
   --instance-type t2.micro \
   --region ${AWS_DEFAULT_REGION} --placement AvailabilityZone=${AWS_AVAILABILITY_ZONE} \
   --key-name ${AWS_CLIENT_PEM} \
@@ -31,7 +23,7 @@ aws_wait_instance
 
 aws ec2 create-tags --resources ${INSTANCE_ID} --tags "Key=Name,Value=webserver02"
 
-VOLUME_INSTANCE_ID=$(aws ec2 describe-instances \
+export VOLUME_INSTANCE_ID=$(aws ec2 describe-instances \
   --filters "Name=instance-id,Values=${INSTANCE_ID}" \
   --query 'Reservations[0].Instances[0].BlockDeviceMappings[*].Ebs.VolumeId' --output text)
 #  | node -e "require('curt').stdin((x) => { stdout(_.map(x.Reservations[0].Instances[0].BlockDeviceMappings, 'Ebs.VolumeId').join(' ')); }, 'json')")

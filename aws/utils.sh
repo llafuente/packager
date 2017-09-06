@@ -19,7 +19,7 @@ function aws_prerequisites {
 function aws_get_instance_ip {
   export INSTANCE_IP=$(aws ec2 describe-instances \
     --filters "Name=instance-id,Values=${INSTANCE_ID}" \
-    --query 'Reservations[0].Instances[0].PublicDnsName' --output text)
+    --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
   echo "INSTANCE_IP=${INSTANCE_IP}"
 }
 
@@ -61,4 +61,30 @@ function ssh_until_sucesss {
     echo "new ssh attempt..."
     ssh -i ~/.ssh/${AWS_CLIENT_PEM}.pem ec2-user@${INSTANCE_IP} "exit" && repeat=false
   done
+}
+
+
+function get_ami {
+  # TODO choose dynamically
+  # N. Virginia
+  # CentOS 7.2 x86_64 with cloud-init (PV) - ami-0fbdf765
+  # CentOS 7.2 x86_64 with cloud-init (HVM) - ami-83bdf7e9
+  # 
+  # Ireland
+  # CentOS 7.2 x86_64 with cloud-init (PV) - ami-0c5ffc7f
+  # CentOS 7.2 x86_64 with cloud-init (HVM) - ami-1f5dfe6c
+  #
+  # Fankfurt
+  # CentOS 7.2 x86_64 with cloud-init (PV) - ami-87d2ceeb
+  # CentOS 7.2 x86_64 with cloud-init (HVM) - ami-96d2cefa
+  if [ ${AWS_DEFAULT_REGION} == "us-east-1" ]
+  then
+    echo "ami-83bdf7e9"
+  elif [ ${AWS_DEFAULT_REGION} == "eu-central-1" ]
+  then
+    echo "ami-96d2cefa"
+  elif [ ${AWS_DEFAULT_REGION} == "eu-central-1" ]
+  then
+    echo "ami-96d2cefa"
+  fi
 }

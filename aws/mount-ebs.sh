@@ -1,15 +1,4 @@
-{{< highlight bash >}}
-### for a single command
-your-failure-command || echo
-
-
-### for multiline / zones
-
-set +e
-your-failure-command
-your-failure-command2
-set -e
-{{< /highlight >}}#!bin/sh
+#!/bin/sh
 
 set -exuo pipefail
 
@@ -85,6 +74,8 @@ if [ -x "$(command -v mongo)" ] && [ ! -h /var/lib/mongo ]; then
   sudo cp -R -p /var/lib/mongo /media/${MOUNT}/mongo
   sudo mv /var/lib/mongo /var/lib/mongo.back
   sudo ln -sf /media/${MOUNT}/mongo /var/lib/mongo
+  #sudo chown mongod.mongod /var/lib/mongo
+  #sudo chown -R mongod.mongod /media/${MOUNT}/mongo
 
   sudo systemctl start mongod
 fi

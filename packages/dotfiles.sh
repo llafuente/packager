@@ -57,7 +57,7 @@ fi
 
 # my terminator/sublime config requires this font
 cd /tmp
-wget -O AnonymousPro.zip http://www.marksimonson.com/assets/content/fonts/AnonymousPro-1.002.zip
+curl -o AnonymousPro.zip "http://www.marksimonson.com/assets/content/fonts/AnonymousPro-1.002.zip"
 unzip AnonymousPro.zip
 rm AnonymousPro.zip
 

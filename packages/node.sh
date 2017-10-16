@@ -24,8 +24,6 @@ case $i in
 esac
 done
 
-sudo yum install -y wget
-
 sudo rm -rf /tmp/node/
 mkdir -p /tmp/node/
 cd /tmp/node/

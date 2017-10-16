@@ -1,20 +1,25 @@
 #!/bin/sh
 
+# usage:
+# sh node.sh --lts # v6, default
+# sh node.sh --latest # v8
+# sh node.sh --legacy # 10.40
+
 set -exuo pipefail
 
-MODE="legacy"
+MODE="lts"
 for i in "$@"
 do
 case $i in
-  --legacy=*)
+  --legacy*)
     MODE="legacy"
     shift # past argument=value
   ;;
-  --lts=*)
+  --lts*)
     MODE="lts"
     shift # past argument=value
   ;;
-  --latest=*)
+  --latest*)
     MODE="latest"
     shift # past argument=value
   ;;

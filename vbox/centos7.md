@@ -40,6 +40,32 @@ proxy_password=yyy
 #
 ```
 
+# configure CURL proxy
+
+vi ~/.curlrc
+
+```
+proxy = http://username:password@proxy.com:8080
+```
+
+# configure NPM proxy
+
+vi ~/.npmrc
+
+```
+proxy = http://username:password@proxy.com:8080
+```
+
+# configure GIT proxy
+
+vi ~/.gitconfig
+
+```
+[http]
+  proxy = http://username:password@proxy.com:8080
+  sslverify = false
+```
+
 # mount local folders
 
 * On the VirtualBox running machine: Devices -> "Install Guest Additions"

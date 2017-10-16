@@ -28,9 +28,9 @@ sudo rm -rf /tmp/node/
 mkdir -p /tmp/node/
 cd /tmp/node/
 
-if [ "${MODE}" -eq "legacy" ]; then
+if [ "${MODE}" == "legacy" ]; then
   curl -o node.tar.gz https://nodejs.org/dist/v0.10.40/node-v0.10.40-linux-x64.tar.gz
-elif [ "${MODE}" -eq "lts" ]; then
+elif [ "${MODE}" == "lts" ]; then
   #curl -o node.tar.gz https://nodejs.org/dist/v4.4.5/node-v4.4.5-linux-x64.tar.gz
   curl -o node.tar.gz https://nodejs.org/dist/v6.11.4/node-v6.11.4-linux-x64.tar.gz
 else

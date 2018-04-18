@@ -69,30 +69,32 @@ vi ~/.gitconfig
 # mount local folders
 
 * On the VirtualBox running machine: Devices -> "Install Guest Additions"
-* Inside 
+* Inside
   ```
   yum update -y
   yum install -y gcc kernel-devel make yum bzip2 dkms
-  
+
   # reboot # do it yourself :)
   ```
-  
+
   ```
   mkdir /cdrom
   mount /dev/cdrom /cdrom
   /cdrom/VBoxLinuxAdditions.run
-  
+
   # reboot # do it yourself :)
   ```
-  
+
   After any `yum update`º, rember to do: `service vboxdrv setup`
-  
+
   ```
   # list mounted
   mount -l | grep vboxsf
   ```
 
-  
+
   If you have permissions problems this may help: `sudo usermod -aG vboxsf $(whoami)`
-  
+
   I don't need it because i'm root always
+
+  NOTE: this require a reboot
